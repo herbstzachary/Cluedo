@@ -1,5 +1,5 @@
 import pygame
-from pygame import Color
+from pygame import Color, Surface
 
 from Enums import TileTypes
 from Rooms import *

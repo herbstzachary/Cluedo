@@ -1,4 +1,5 @@
-from enum import Enum
+from enum import Enum, StrEnum
+
 
 class TileTypes(Enum):
     HALLWAY = 0,
@@ -12,10 +13,10 @@ class EntranceDirections(Enum):
     SOUTH = 2,
     WEST = 3
 
-class Characters(Enum):
-    SCARLET = 0,
-    MUSTARD = 1,
-    WHITE = 2,
-    GREEN = 3,
-    PEACOCK = 4,
-    PLUM = 5
+class Characters(StrEnum):
+    SCARLET = "Miss Scarlet",
+    MUSTARD = "Colonel Mustard",
+    WHITE = "Mrs. White",
+    GREEN = "Mr. Green",
+    PEACOCK = "Mrs. Peacock",
+    PLUM = "Professor Plum"
