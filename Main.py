@@ -5,7 +5,7 @@ import pygame, sys
 from pygame.locals import *
 
 from Board import Board
-from Cluedo.PlayerPlayArea import PlayerPlayArea
+from PlayerPlayArea import PlayerPlayArea
 from Enums import Characters
 from Player import Player
 
