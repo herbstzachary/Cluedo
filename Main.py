@@ -6,8 +6,41 @@ from pygame.locals import *
 
 from Board import Board
 from PlayerPlayArea import PlayerPlayArea
-from Enums import Characters
+from Enums import Characters, Rooms, Weapons
 from Player import Player
+
+def __create_deck(solution):
+    deck = []
+    for character in list(Characters):
+        if character not in solution:
+            deck.append(character)
+
+    for room in list(Rooms):
+        if room not in solution:
+            deck.append(room)
+
+    for weapon in list(Weapons):
+        if weapon not in solution:
+            deck.append(weapon)
+
+    return deck
+
+def __create_hands(card_deck, number_of_players):
+    hands = []
+    each_player_gets = int(len(card_deck) / number_of_players)
+    current_card = 0
+    for _ in range(number_of_players):
+        hand = []
+        for i in range(current_card, current_card + each_player_gets):
+            hand.append(card_deck[i])
+        current_card = current_card + each_player_gets
+        hands.append(hand)
+
+    for i in range(current_card, len(card_deck)):
+        for hand in hands:
+            hand.append(card_deck[i])
+
+    return hands
 
 # Initializing
 pygame.init()
@@ -18,13 +51,24 @@ SCREEN_WIDTH = screenInfo.current_w
 SCREEN_HEIGHT = screenInfo.current_h
 DISPLAY_SURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+solution = [
+    list(Characters)[random.randint(0, len(Characters) - 1)],
+    list(Rooms)[random.randint(0, len(Rooms) - 1)],
+    list(Weapons)[random.randint(0, len(Weapons) - 1)]
+]
+
+deck = __create_deck(solution)
+random.shuffle(deck)
+
+player_hands = __create_hands(deck, 6)
+
 players = [
-    Player(Characters.SCARLET, Color("darkred"), (8, 24)),
-    Player(Characters.MUSTARD, Color("yellow3"),(1 , 17)),
-    Player(Characters.WHITE, Color("white"),(10, 0)),
-    Player(Characters.GREEN, Color("forestgreen"), (15, 0)),
-    Player(Characters.PEACOCK, Color("mediumblue"), (24, 6)),
-    Player(Characters.PLUM, Color("purple4"), (24, 19))
+    Player(Characters.SCARLET, Color("darkred"), (8, 24), player_hands[0]),
+    Player(Characters.MUSTARD, Color("yellow3"),(1 , 17), player_hands[1]),
+    Player(Characters.WHITE, Color("white"),(10, 0), player_hands[2]),
+    Player(Characters.GREEN, Color("forestgreen"), (15, 0), player_hands[3]),
+    Player(Characters.PEACOCK, Color("mediumblue"), (24, 6), player_hands[4]),
+    Player(Characters.PLUM, Color("purple4"), (24, 19), player_hands[5])
 ]
 
 board_font = pygame.font.SysFont('Comic Sans MS', 30)
