@@ -4,9 +4,10 @@ import random
 import pygame, sys
 from pygame.locals import *
 
+import Enums
 from Board import Board
 from PlayerPlayArea import PlayerPlayArea
-from Enums import Characters, Rooms, Weapons, TurnPhases
+from Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
 from Player import Player
 
 def __create_deck(solution):
@@ -91,18 +92,25 @@ while True:
             if current_player_phase == TurnPhases.MOVE:
                 valid_move = board.move_player_if_valid(players[current_player], pos)
                 if valid_move:
-                    current_player_phase = TurnPhases.SUGGEST
+                    if players[current_player].current_tile.tile_type == TileTypes.ROOM:
+                        current_player_phase = TurnPhases.SUGGEST
+                        player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(players[current_player].current_tile)
+                    else:
+                        current_player_phase = TurnPhases.ACCUSE
             elif current_player_phase == TurnPhases.SUGGEST:
                 player_area.select_cards_for_guess(pos)
-                current_player_phase = TurnPhases.ACCUSE
+                if player_area.submit_guess(pos):
+                    #compare to other hands
+                    current_player_phase = TurnPhases.ACCUSE
             elif current_player_phase == TurnPhases.ACCUSE:
-                if current_player == len(players) - 1:
-                    current_player = 0
-                else:
-                    current_player += 1
-                current_player_phase = TurnPhases.MOVE
-                move_number = random.randint(1, 6) + random.randint(1, 6)
-                board.get_move_candidates(players[current_player].current_tile, move_number)
+                if player_area.skip_accuse(pos) :
+                    if current_player == len(players) - 1:
+                        current_player = 0
+                    else:
+                        current_player += 1
+                    current_player_phase = TurnPhases.MOVE
+                    move_number = random.randint(1, 6) + random.randint(1, 6)
+                    board.get_move_candidates(players[current_player].current_tile, move_number)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()

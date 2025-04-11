@@ -1,7 +1,7 @@
-from Enums import EntranceDirections
+from Enums import EntranceDirections, Rooms
 
 class Kitchen:
-    name = "Kitchen"
+    type = Rooms.KITCHEN
 
     def __init__(self):
         self.locations = []
@@ -14,7 +14,7 @@ class Kitchen:
         self.entrances = [(5, 6, EntranceDirections.SOUTH)]
 
 class DiningRoom:
-    name = "Dining Room"
+    type = Rooms.DINING_ROOM
 
     def __init__(self):
         self.locations = []
@@ -27,7 +27,7 @@ class DiningRoom:
         self.entrances = [(8, 12, EntranceDirections.EAST), (7, 15, EntranceDirections.SOUTH)]
 
 class Lounge:
-    name =  "Lounge"
+    type = Rooms.LOUNGE
 
     def __init__(self):
         self.locations = []
@@ -40,7 +40,7 @@ class Lounge:
         self.entrances = [(7, 19, EntranceDirections.NORTH)]
 
 class Ballroom:
-    name = "Ballroom"
+    type = Rooms.BALLROOM
 
     def __init__(self):
         self.locations = []
@@ -58,7 +58,7 @@ class Ballroom:
         ]
 
 class Center:
-    name = ""
+    type = None
 
     def __init__(self):
         self.locations = []
@@ -70,7 +70,7 @@ class Center:
         self.entrances = []
 
 class Hall:
-    name = "Hall"
+    type = Rooms.HALL
 
     def __init__(self):
         self.locations = []
@@ -82,7 +82,7 @@ class Hall:
         self.entrances = [(12, 18, EntranceDirections.NORTH), (13, 18, EntranceDirections.NORTH)]
 
 class Conservatory:
-    name = "Conservatory"
+    type = Rooms.CONSERVATORY
 
     def __init__(self):
         self.locations = []
@@ -95,7 +95,7 @@ class Conservatory:
         self.entrances = [(19, 4, EntranceDirections.SOUTH)]
 
 class BilliardRoom:
-    name = "Billiard Room"
+    type = Rooms.BILLIARD_ROOM
 
     def __init__(self):
         self.locations = []
@@ -107,7 +107,7 @@ class BilliardRoom:
         self.entrances = [(19, 9, EntranceDirections.WEST), (23, 12, EntranceDirections.SOUTH)]
 
 class Library:
-    name = "Library"
+    type = Rooms.LIBRARY
 
     def __init__(self):
         self.locations = []
@@ -120,7 +120,7 @@ class Library:
         self.entrances = [(21, 14, EntranceDirections.NORTH), (18, 16, EntranceDirections.WEST)]
 
 class Study:
-    name = "Study"
+    type = Rooms.STUDY
 
     def __init__(self):
         self.locations = []

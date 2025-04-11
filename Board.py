@@ -153,7 +153,7 @@ class Board:
 
         for room in self.rooms:
             tile_drawing_over = self.board[room.center[1]][room.center[0]]
-            text = self.board_font.render(room.name, True, Color("white"))
+            text = self.board_font.render(room.type, True, Color("white"))
             text_rect = text.get_rect()
             text_rect.center = (tile_drawing_over.top_left_corner[0], tile_drawing_over.top_left_corner[1])
             surface.blit(text, text_rect)
@@ -284,3 +284,8 @@ class Board:
             return True
         else:
             return False
+
+    def get_room_for_tile(self, tile):
+        for room in self.rooms:
+            if (tile.x, tile.y) in room.locations:
+                return room.type
