@@ -1,14 +1,11 @@
 class Player:
 
-    def __init__(self, character, color, start_loc, hand):
+    def __init__(self, character, color, start_tile, hand):
         self.character = character
         self.color = color
-        self.current_loc = start_loc
+        self.current_tile = start_tile
         self.hand = hand
         self.knowledge = hand
-
-    def set_location(self, new_loc):
-        self.current_loc = new_loc
 
     def add_knowledge(self, clue):
         self.knowledge.append(clue)

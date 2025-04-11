@@ -6,7 +6,7 @@ from Rooms import *
 from Tile import Tile
 
 class Board:
-    def __init__(self, screen_width, screen_height, number_of_tiles, players, board_font):
+    def __init__(self, screen_width, screen_height, number_of_tiles, board_font):
 
         board_space = min(screen_width / 2, screen_height)
         self.tile_size = int(board_space / number_of_tiles)
@@ -33,7 +33,7 @@ class Board:
         self.__add_blanks()
         self.__add_rooms()
 
-        self.players = players
+        self.players = None
         self.board_font = board_font
 
     def __add_blanks(self):
@@ -142,8 +142,7 @@ class Board:
             return False
 
     def __draw_player(self, player, surface):
-        player_loc = player.current_loc
-        tile = self.board[player_loc[1]][player_loc[0]]
+        tile = player.current_tile
         tile_center = (tile.top_left_corner[0] + (tile.size / 2), tile.top_left_corner[1] + (tile.size / 2))
         pygame.draw.circle(surface, player.color, tile_center, tile.size / 2.5)
 
@@ -164,28 +163,28 @@ class Board:
 
         self.__draw_walls(surface)
 
-    def get_move_candidates(self, start, max_moves):
-        #If player is in room check all posibbilities from all entrances
+    def get_move_candidates(self, start_tile, max_moves):
+        #If player is in room check all posibilities from all entrances
         checked = []
         to_check = []
 
-        if self.board[start[1]][start[0]].tile_type == TileTypes.HALLWAY:
-            to_check.append((start[0], start[1], 0))
-        elif self.board[start[1]][start[0]].tile_type == TileTypes.ROOM:
-            room = self.__get_entrances_for_room(start)
+        if start_tile.tile_type == TileTypes.HALLWAY:
+            to_check.append((start_tile.x, start_tile.y, 0))
+        elif start_tile.tile_type == TileTypes.ROOM:
+            room = self.__get_entrances_for_room(start_tile)
             for entrance in room.entrances:
-                self.get_move_candidates(entrance, max_moves)
+                self.get_move_candidates(self.board[entrance[1]][entrance[0]], max_moves)
             return
         else:
-            entry = self.board[start[1]][start[0]].entrance_direction
+            entry = start_tile.entrance_direction
             if entry == EntranceDirections.NORTH:
-                to_check.append((start[0], start[1] - 1, 1))
+                to_check.append((start_tile.x, start_tile.y - 1, 1))
             elif entry == EntranceDirections.EAST:
-                to_check.append((start[0] + 1, start[1], 1))
+                to_check.append((start_tile.x + 1, start_tile.y, 1))
             elif entry == EntranceDirections.SOUTH:
-                to_check.append((start[0], start[1] + 1, 1))
+                to_check.append((start_tile.x, start_tile.y + 1, 1))
             elif entry == EntranceDirections.WEST:
-                to_check.append((start[0] - 1, start[1], 1))
+                to_check.append((start_tile.x - 1, start_tile.y, 1))
 
         while len(to_check) != 0:
             tile = to_check.pop()
@@ -200,7 +199,7 @@ class Board:
             right1 = x + 1
 
             # Don't check the tile we started from
-            if ((x, y) != (start[0], start[1])) and not self.board[y][x].occupied:
+            if ((x, y) != (start_tile.x, start_tile.y)) and not self.board[y][x].occupied:
                 if self.board[y][x].tile_type == TileTypes.HALLWAY or self.board[y][x].tile_type == TileTypes.ROOM_ENTRANCE:
                     self.board[y][x].move_candidate = True
                 else:
@@ -210,48 +209,45 @@ class Board:
             if distance_moved_so_far + 1 > max_moves:
                 continue
 
-            if self.__check_direction(start, left1, y, max_moves, EntranceDirections.EAST) and (left1, y, distance_moved_so_far + 1) not in checked:
+            if self.__check_direction(start_tile, left1, y, max_moves, EntranceDirections.EAST) and (left1, y, distance_moved_so_far + 1) not in checked:
                 to_check.append((left1, y, distance_moved_so_far + 1))
 
-            if self.__check_direction(start, right1, y, max_moves, EntranceDirections.WEST) and (right1, y, distance_moved_so_far + 1) not in checked:
+            if self.__check_direction(start_tile, right1, y, max_moves, EntranceDirections.WEST) and (right1, y, distance_moved_so_far + 1) not in checked:
                 to_check.append((right1, y, distance_moved_so_far + 1))
 
-            if self.__check_direction(start, x, up1, max_moves, EntranceDirections.SOUTH) and (x, up1, distance_moved_so_far + 1) not in checked:
+            if self.__check_direction(start_tile, x, up1, max_moves, EntranceDirections.SOUTH) and (x, up1, distance_moved_so_far + 1) not in checked:
                 to_check.append((x, up1, distance_moved_so_far + 1))
 
-            if self.__check_direction(start, x, down1, max_moves, EntranceDirections.NORTH) and (x, down1, distance_moved_so_far + 1) not in checked:
+            if self.__check_direction(start_tile, x, down1, max_moves, EntranceDirections.NORTH) and (x, down1, distance_moved_so_far + 1) not in checked:
                 to_check.append((x, down1, distance_moved_so_far + 1))
 
     def __check_direction(self, start, new_x, new_y, max_moves, enter_direction):
         if 0 < new_y < len(self.board) and 0 < new_x < len(self.board[new_y]):
-            if abs(new_x - start[0]) + abs(new_y - start[1]) <= max_moves and self.__is_viable_tile(start, (new_x, new_y), enter_direction):
+            if abs(new_x - start.x) + abs(new_y - start.y) <= max_moves and self.__is_viable_tile(start, self.board[new_y][new_x], enter_direction):
                 return True
 
         return False
 
-    def __get_room_for_entrance(self, coord):
+    def __get_room_for_entrance(self, tile):
         for room in self.rooms:
             for entrance in room.entrances:
-                if (coord[0], coord[1]) == (entrance[0], entrance[1]):
+                if (tile.x, tile.y) == (entrance[0], entrance[1]):
                     return room
 
         return None
 
-    def __get_entrances_for_room(self, coord):
+    def __get_entrances_for_room(self, tile):
         for room in self.rooms:
-            if coord[0] in range(room.center[0] - 1, room.center[0] + 2) and coord[1] in range(room.center[1], room.center[1] + 2):
+            if tile.x in range(room.center[0] - 1, room.center[0] + 2) and tile.y in range(room.center[1], room.center[1] + 2):
                 return room
 
         return None
 
     def __is_viable_tile(self, start, dest, enter_from_direction):
-        start_tile = self.board[start[1]][start[0]]
-        new_tile = self.board[dest[1]][dest[0]]
-
-        if new_tile.tile_type == TileTypes.ROOM_ENTRANCE and new_tile.entrance_direction == enter_from_direction:
-            if start_tile.tile_type == TileTypes.HALLWAY or (start_tile.tile_type == TileTypes.ROOM_ENTRANCE and self.__get_room_for_entrance(start) != self.__get_room_for_entrance(dest)):
+        if dest.tile_type == TileTypes.ROOM_ENTRANCE and dest.entrance_direction == enter_from_direction:
+            if start.tile_type == TileTypes.HALLWAY or (start.tile_type == TileTypes.ROOM_ENTRANCE and self.__get_room_for_entrance(start) != self.__get_room_for_entrance(dest)):
                 return True
-        elif new_tile.tile_type == TileTypes.HALLWAY:
+        elif dest.tile_type == TileTypes.HALLWAY:
             return True
         else:
             return False
@@ -268,9 +264,9 @@ class Board:
             return
 
         if selected_tile.move_candidate:
-            self.board[player.current_loc[1]][player.current_loc[0]].occupied = False
+            player.current_tile.occupied = False
             if selected_tile.tile_type == TileTypes.ROOM_ENTRANCE:
-                room = self.__get_room_for_entrance((selected_tile.x, selected_tile.y))
+                room = self.__get_room_for_entrance(selected_tile)
                 room_center = room.center
                 for y in range(2):
                     for x in range(-1, 2):
@@ -279,7 +275,7 @@ class Board:
                             selected_tile = self.board[fixed_pos[1]][fixed_pos[0]]
                             break
 
-            player.current_loc = (selected_tile.x, selected_tile.y)
+            player.current_tile = selected_tile
             selected_tile.occupied = True
 
             for row in self.board:

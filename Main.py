@@ -6,7 +6,7 @@ from pygame.locals import *
 
 from Board import Board
 from PlayerPlayArea import PlayerPlayArea
-from Enums import Characters, Rooms, Weapons
+from Enums import Characters, Rooms, Weapons, TurnPhases
 from Player import Player
 
 def __create_deck(solution):
@@ -62,37 +62,47 @@ random.shuffle(deck)
 
 player_hands = __create_hands(deck, 6)
 
-players = [
-    Player(Characters.SCARLET, Color("darkred"), (8, 24), player_hands[0]),
-    Player(Characters.MUSTARD, Color("yellow3"),(1 , 17), player_hands[1]),
-    Player(Characters.WHITE, Color("white"),(10, 0), player_hands[2]),
-    Player(Characters.GREEN, Color("forestgreen"), (15, 0), player_hands[3]),
-    Player(Characters.PEACOCK, Color("mediumblue"), (24, 6), player_hands[4]),
-    Player(Characters.PLUM, Color("purple4"), (24, 19), player_hands[5])
-]
-
 board_font = pygame.font.SysFont('Comic Sans MS', 30)
 player_font = pygame.font.SysFont('Comic Sans MS', 30)
 card_font = pygame.font.SysFont('Comic Sans MS', 15)
 
-board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, players, board_font)
+board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, board_font)
+players = [
+    Player(Characters.SCARLET, Color("darkred"), board.board[24][8], player_hands[0]),
+    Player(Characters.MUSTARD, Color("yellow3"),board.board[17][1], player_hands[1]),
+    Player(Characters.WHITE, Color("white"),board.board[0][10], player_hands[2]),
+    Player(Characters.GREEN, Color("forestgreen"), board.board[0][15], player_hands[3]),
+    Player(Characters.PEACOCK, Color("mediumblue"), board.board[6][24], player_hands[4]),
+    Player(Characters.PLUM, Color("purple4"), board.board[19][24], player_hands[5])
+]
+board.players = players
+
 player_area = PlayerPlayArea(player_font, card_font, 0, SCREEN_WIDTH / 2)
 current_player = 0
 board.draw_board_state(DISPLAY_SURF)
+current_player_phase = TurnPhases.MOVE
+move_number = random.randint(1, 6) + random.randint(1, 6)
+board.get_move_candidates(players[current_player].current_tile, move_number)
 
 while True:
-    move_number = random.randint(1, 6) + random.randint(1, 6)
-    board.get_move_candidates(players[current_player].current_loc, 4)
-
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
-            valid_move = board.move_player_if_valid(players[current_player], pos)
-            if valid_move:
+            if current_player_phase == TurnPhases.MOVE:
+                valid_move = board.move_player_if_valid(players[current_player], pos)
+                if valid_move:
+                    current_player_phase = TurnPhases.SUGGEST
+            elif current_player_phase == TurnPhases.SUGGEST:
+                player_area.select_cards_for_guess(pos)
+                current_player_phase = TurnPhases.ACCUSE
+            elif current_player_phase == TurnPhases.ACCUSE:
                 if current_player == len(players) - 1:
                     current_player = 0
                 else:
                     current_player += 1
+                current_player_phase = TurnPhases.MOVE
+                move_number = random.randint(1, 6) + random.randint(1, 6)
+                board.get_move_candidates(players[current_player].current_tile, move_number)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
@@ -103,5 +113,5 @@ while True:
 
     DISPLAY_SURF.fill(Color("white"))
     board.draw_board_state(DISPLAY_SURF)
-    player_area.draw_player_play_area(players[current_player], DISPLAY_SURF)
+    player_area.draw_player_play_area(players[current_player], current_player_phase, DISPLAY_SURF)
     pygame.display.update()

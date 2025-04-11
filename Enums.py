@@ -38,3 +38,8 @@ class Weapons(StrEnum):
     REVOLVER = "Revolver",
     ROPE = "Rope",
     WRENCH = "Wrench"
+
+class TurnPhases(StrEnum):
+    MOVE = "Move",
+    SUGGEST = "Suggest",
+    ACCUSE = "Accuse"

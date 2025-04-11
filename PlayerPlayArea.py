@@ -19,12 +19,8 @@ class PlayerPlayArea:
         self.weapons = list(Enums.Weapons)
         self.suspects = list(Enums.Characters)
 
-    def draw_player_play_area(self, player, surface):
-        self.__draw_current_turn_text(player, surface)
-        self.__draw_player_clue_info(player, surface)
-
-    def __draw_current_turn_text(self, player, surface):
-        text = self.top_font.render("Player's turn: " + player.character.value, True, Color("black"))
+    def __draw_current_turn_text(self, player, phase, surface):
+        text = self.top_font.render(player.character.value + "'s " + phase + " Phase", True, Color("black"))
         text_rect = text.get_rect()
         text_rect.center = (self.x_start + (self.width / 2), text_rect.height)
         surface.blit(text, text_rect)
@@ -70,3 +66,10 @@ class PlayerPlayArea:
 
         left_x += (card_width * 2) + self.x_margin
         self.__draw_clues(self.suspects, left_x, top_y, card_width, card_height, player, surface)
+
+    def draw_player_play_area(self, player, turn_phase, surface):
+        self.__draw_current_turn_text(player, turn_phase, surface)
+        self.__draw_player_clue_info(player, surface)
+
+    def select_cards_for_guess(self, mouse):
+        return 0
