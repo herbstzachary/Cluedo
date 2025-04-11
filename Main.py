@@ -73,9 +73,10 @@ players = [
 
 board_font = pygame.font.SysFont('Comic Sans MS', 30)
 player_font = pygame.font.SysFont('Comic Sans MS', 30)
+card_font = pygame.font.SysFont('Comic Sans MS', 15)
 
 board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, players, board_font)
-player_area = PlayerPlayArea(player_font, 0, SCREEN_WIDTH / 2)
+player_area = PlayerPlayArea(player_font, card_font, 0, SCREEN_WIDTH / 2)
 current_player = 0
 board.draw_board_state(DISPLAY_SURF)
 
