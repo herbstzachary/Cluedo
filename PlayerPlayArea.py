@@ -153,3 +153,7 @@ class PlayerPlayArea:
     def skip_accuse(self, mouse):
         if self.skip_accuse_button.collidepoint(mouse):
             return True
+
+    def clear_suggestion(self):
+        for key in self.current_suggestion.keys():
+            self.current_suggestion[key] = None

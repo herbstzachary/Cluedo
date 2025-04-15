@@ -43,6 +43,27 @@ def __create_hands(card_deck, number_of_players):
 
     return hands
 
+def __check_suggestion(players, current_player, suggestion):
+    index = players.index(current_player) + 1
+    if index >= len(players):
+        index = 0
+
+    for _ in range(0, len(players)):
+        clues_present = []
+        for card in suggestion.values():
+            if card in players[index].hand:
+                clues_present.append(card)
+        if len(clues_present) == 0:
+            if index >= len(players) - 1:
+                index = 0
+            else:
+                index += 1
+        else:
+            random.shuffle(clues_present)
+            return clues_present[0]
+
+    return None
+
 # Initializing
 pygame.init()
 
@@ -79,38 +100,45 @@ players = [
 board.players = players
 
 player_area = PlayerPlayArea(player_font, card_font, 0, SCREEN_WIDTH / 2)
-current_player = 0
+current_player = players[0]
 board.draw_board_state(DISPLAY_SURF)
 current_player_phase = TurnPhases.MOVE
 move_number = random.randint(1, 6) + random.randint(1, 6)
-board.get_move_candidates(players[current_player].current_tile, move_number)
+board.get_move_candidates(current_player.current_tile, move_number)
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
             if current_player_phase == TurnPhases.MOVE:
-                valid_move = board.move_player_if_valid(players[current_player], pos)
+                valid_move = board.move_player_if_valid(current_player, pos)
                 if valid_move:
-                    if players[current_player].current_tile.tile_type == TileTypes.ROOM:
+                    if current_player.current_tile.tile_type == TileTypes.ROOM:
                         current_player_phase = TurnPhases.SUGGEST
-                        player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(players[current_player].current_tile)
+                        player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(current_player.current_tile)
                     else:
                         current_player_phase = TurnPhases.ACCUSE
             elif current_player_phase == TurnPhases.SUGGEST:
                 player_area.select_cards_for_guess(pos)
                 if player_area.submit_guess(pos):
-                    #compare to other hands
+                    suggestion = player_area.current_suggestion
+                    new_knowledge = __check_suggestion(players, current_player, suggestion)
+
+                    if new_knowledge is not None:
+                        current_player.add_knowledge(new_knowledge)
+
                     current_player_phase = TurnPhases.ACCUSE
+                    player_area.clear_suggestion()
             elif current_player_phase == TurnPhases.ACCUSE:
                 if player_area.skip_accuse(pos) :
-                    if current_player == len(players) - 1:
-                        current_player = 0
+                    index = players.index(current_player)
+                    if index == len(players) - 1:
+                        current_player = players[0]
                     else:
-                        current_player += 1
+                        current_player = players[index + 1]
                     current_player_phase = TurnPhases.MOVE
                     move_number = random.randint(1, 6) + random.randint(1, 6)
-                    board.get_move_candidates(players[current_player].current_tile, move_number)
+                    board.get_move_candidates(current_player.current_tile, move_number)
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
@@ -121,5 +149,5 @@ while True:
 
     DISPLAY_SURF.fill(Color("white"))
     board.draw_board_state(DISPLAY_SURF)
-    player_area.draw_player_play_area(players[current_player], current_player_phase, DISPLAY_SURF)
+    player_area.draw_player_play_area(current_player, current_player_phase, DISPLAY_SURF)
     pygame.display.update()
