@@ -6,63 +6,10 @@ from pygame.locals import *
 
 import Enums
 from Board import Board
+from GameplayHelpers import create_deck, create_hands, check_suggestion
 from PlayerPlayArea import PlayerPlayArea
 from Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
 from Player import Player
-
-def __create_deck(solution):
-    deck = []
-    for character in list(Characters):
-        if character not in solution:
-            deck.append(character)
-
-    for room in list(Rooms):
-        if room not in solution:
-            deck.append(room)
-
-    for weapon in list(Weapons):
-        if weapon not in solution:
-            deck.append(weapon)
-
-    return deck
-
-def __create_hands(card_deck, number_of_players):
-    hands = []
-    each_player_gets = int(len(card_deck) / number_of_players)
-    current_card = 0
-    for _ in range(number_of_players):
-        hand = []
-        for i in range(current_card, current_card + each_player_gets):
-            hand.append(card_deck[i])
-        current_card = current_card + each_player_gets
-        hands.append(hand)
-
-    for i in range(current_card, len(card_deck)):
-        for hand in hands:
-            hand.append(card_deck[i])
-
-    return hands
-
-def __check_suggestion(players, current_player, suggestion):
-    index = players.index(current_player) + 1
-    if index >= len(players):
-        index = 0
-
-    for _ in range(0, len(players)):
-        clues_present = []
-        for card in suggestion.values():
-            if card in players[index].hand:
-                clues_present.append(card)
-        if len(clues_present) == 0:
-            if index >= len(players) - 1:
-                index = 0
-            else:
-                index += 1
-        else:
-            random.shuffle(clues_present)
-            return clues_present[0]
-
-    return None
 
 # Initializing
 pygame.init()
@@ -79,14 +26,14 @@ solution = [
     list(Weapons)[random.randint(0, len(Weapons) - 1)]
 ]
 
-deck = __create_deck(solution)
+deck = create_deck(solution)
 random.shuffle(deck)
 
-player_hands = __create_hands(deck, 6)
+player_hands = create_hands(deck, 6)
 
-board_font = pygame.font.SysFont('Comic Sans MS', 30)
-player_font = pygame.font.SysFont('Comic Sans MS', 30)
-card_font = pygame.font.SysFont('Comic Sans MS', 15)
+board_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
+player_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
+card_font = pygame.font.SysFont('Comic Sans MS', int((20 * SCREEN_HEIGHT) / 1600))
 
 board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, board_font)
 players = [
@@ -122,15 +69,17 @@ while True:
                 player_area.select_cards_for_guess(pos)
                 if player_area.submit_guess(pos):
                     suggestion = player_area.current_suggestion
-                    new_knowledge = __check_suggestion(players, current_player, suggestion)
+                    new_knowledge = check_suggestion(players, current_player, suggestion)
 
                     if new_knowledge is not None:
-                        current_player.add_knowledge(new_knowledge)
+                        player_area.player_that_revealed_info = new_knowledge[0]
+                        current_player.add_knowledge(new_knowledge[1])
 
                     current_player_phase = TurnPhases.ACCUSE
                     player_area.clear_suggestion()
             elif current_player_phase == TurnPhases.ACCUSE:
-                if player_area.skip_accuse(pos) :
+                if player_area.skip_accuse(pos):
+                    player_area.player_that_revealed_info = -1
                     index = players.index(current_player)
                     if index == len(players) - 1:
                         current_player = players[0]

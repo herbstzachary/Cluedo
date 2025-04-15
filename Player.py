@@ -5,7 +5,7 @@ class Player:
         self.color = color
         self.current_tile = start_tile
         self.hand = hand
-        self.knowledge = hand
+        self.knowledge = hand.copy()
 
     def add_knowledge(self, clue):
         self.knowledge.append(clue)

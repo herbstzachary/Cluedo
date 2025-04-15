@@ -20,7 +20,37 @@ class PlayerPlayArea:
         self.weapons = list(Enums.Weapons)
         self.suspects = list(Enums.Characters)
 
-        top_y = self.y_margin + top_font.size("Phase")[1]
+        self.current_suggestion = {
+            Enums.Rooms: None,
+            Enums.Weapons: None,
+            Enums.Characters: None
+        }
+
+        self.phase_info_area = Rect(
+            self.x_start + self.x_margin,
+            self.y_margin,
+            self.width - self.x_margin,
+            self.top_font.get_linesize()
+        )
+
+        self.suggest_text = self.top_font.render("Submit Suggestion", True, Color("black"))
+        self.suggest_submit_button = self.suggest_text.get_rect()
+        self.suggest_submit_button.centerx = self.phase_info_area.centerx
+        self.suggest_submit_button.top = self.phase_info_area.top
+
+        self.accuse_text = self.top_font.render("Accuse", True, Color("black"))
+        self.accuse_submit_button = self.accuse_text.get_rect()
+        self.accuse_submit_button.left = self.phase_info_area.left
+        self.accuse_submit_button.top = self.phase_info_area.top
+
+        self.skip_accuse_text = self.top_font.render("Skip Accuse Phase", True, Color("black"))
+        self.skip_accuse_button = self.skip_accuse_text.get_rect()
+        self.skip_accuse_button.right = self.phase_info_area.right
+        self.skip_accuse_button.top = self.phase_info_area.top
+
+        self.player_that_revealed_info = -1
+
+        top_y = self.phase_info_area.bottom + self.y_margin
         left_x = self.x_start + self.x_margin
         self.card_width = int((self.width - (self.x_margin * 5)) / 7)
         self.card_height = int((self.height - self.y_margin - top_y) / 3)
@@ -35,27 +65,6 @@ class PlayerPlayArea:
         left_x += weapon_cards_area.width + self.x_margin
         character_cards_area = Rect(left_x, top_y, (self.card_width * 2) + self.x_margin, self.card_height * 3)
         self.character_cards = self.__create_cards(character_cards_area, Enums.Characters)
-
-        self.current_suggestion = {
-            Enums.Rooms: None,
-            Enums.Weapons: None,
-            Enums.Characters: None
-        }
-
-        self.suggest_text = self.top_font.render("Submit Suggestion", True, Color("black"))
-        self.suggest_submit_button = self.suggest_text.get_rect()
-        self.suggest_submit_button.center = (self.x_start + (self.width / 2), self.suggest_submit_button.height / 2)
-
-        self.accuse_text = self.top_font.render("Accuse", True, Color("black"))
-        self.accuse_submit_button = self.accuse_text.get_rect()
-        self.accuse_submit_button.center = (self.x_start + (self.width / 4), self.accuse_submit_button.height / 2)
-
-        self.skip_accuse_text = self.top_font.render("Skip Accuse Phase", True, Color("black"))
-        self.skip_accuse_button = self.skip_accuse_text.get_rect()
-        self.skip_accuse_button.center = (
-            self.accuse_submit_button.left + self.accuse_submit_button.width + (self.width / 2),
-            self.skip_accuse_button.height / 2
-        )
 
     def __create_cards(self, area, category):
         cards = []
@@ -91,12 +100,23 @@ class PlayerPlayArea:
             pygame.draw.rect(surface, Color("black"), text_rect, width=1)
             surface.blit(self.suggest_text, text_rect)
         else:
-            # if None in self.current_suggestion.values():
-            #     pygame.draw.rect(surface, Color("grey"), self.accuse_text_rect)
-            # else:
-            #     pygame.draw.rect(surface, Color("green"), self.accuse_text_rect)
-            # pygame.draw.rect(surface, Color("black"), self.accuse_text_rect, width=1)
-            # surface.blit(self.accuse_text, self.accuse_text_rect)
+            if None in self.current_suggestion.values():
+                pygame.draw.rect(surface, Color("grey"), self.accuse_submit_button)
+            else:
+                pygame.draw.rect(surface, Color("green"), self.accuse_submit_button)
+            pygame.draw.rect(surface, Color("black"), self.accuse_submit_button, width=1)
+            surface.blit(self.accuse_text, self.accuse_submit_button)
+
+            if self.player_that_revealed_info >= 0:
+                revealed_text = self.top_font.render(
+                    "Player " + str(self.player_that_revealed_info + 1) + " revealed " + player.knowledge[-1].value,
+                    True,
+                    Color("black")
+                )
+                revealed_text_rect = revealed_text.get_rect()
+                revealed_text_rect.centerx = (self.skip_accuse_button.left + self.accuse_submit_button.right) / 2
+                revealed_text_rect.top = self.phase_info_area.top
+                surface.blit(revealed_text, revealed_text_rect)
 
             pygame.draw.rect(surface, Color("green"), self.skip_accuse_button)
             pygame.draw.rect(surface, Color("black"), self.skip_accuse_button, width=1)
