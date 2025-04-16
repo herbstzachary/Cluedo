@@ -3,7 +3,7 @@ class Player:
     def __init__(self, character, color, start_tile):
         #Can only assign hands after we know how many players there are
         self.hand = None
-        self.knowledge = None
+        self.knowledge = []
 
         self.character = character
         self.color = color
@@ -13,7 +13,6 @@ class Player:
 
     def set_hand(self, hand):
         self.hand = hand
-        self.knowledge = hand.copy()
 
     def add_knowledge(self, clue):
         self.knowledge.append(clue)

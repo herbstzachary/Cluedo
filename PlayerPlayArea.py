@@ -5,7 +5,6 @@ import Enums
 from Card import Card
 from Enums import TileTypes, TurnPhases
 
-
 class PlayerPlayArea:
     def __init__(self, top_font, card_font, x_start, width):
         self.top_font = top_font
@@ -118,7 +117,7 @@ class PlayerPlayArea:
 
             if self.player_that_revealed_info is not None:
                 revealed_text = self.top_font.render(
-                    "Player " + self.player_that_revealed_info + " revealed " + player.knowledge[-1].value,
+                    self.player_that_revealed_info.character.value + " revealed " + player.knowledge[-1].value,
                     True,
                     Color("black")
                 )
@@ -131,29 +130,27 @@ class PlayerPlayArea:
             pygame.draw.rect(surface, Color("black"), self.skip_accuse_button, width=1)
             surface.blit(self.skip_accuse_text, self.skip_accuse_button)
 
-
-
-    # def __draw_clue_category_title(self, center_x, top_y, title, surface):
-    #     text = self.top_font.render(title, True, Color("black"))
-    #     text_rect = text.get_rect()
-    #     text_rect.center = (center_x, center_y)
-    #     surface.blit(text, text_rect)
-
     def __draw_clues(self, cards, player, surface):
         for card in cards:
             left_x = card.rect.left
             top_y = card.rect.top
+            card_rect = Rect(left_x, top_y, self.card_width, self.card_height)
+
             if card.type in player.knowledge:
-                pygame.draw.rect(surface, Color("red"), Rect(left_x, top_y, self.card_width, self.card_height))
+                pygame.draw.rect(surface, Color("red"), card_rect)
+
+            if card.type in player.hand:
+                pygame.draw.rect(surface, Color("yellow"), card_rect)
+
             if card.type in self.current_suggestion.values():
-                pygame.draw.rect(surface, Color("blue"), Rect(left_x, top_y, self.card_width, self.card_height))
-            pygame.draw.rect(surface, Color("black"), Rect(left_x, top_y, self.card_width, self.card_height), width=2)
+                pygame.draw.rect(surface, Color("blue"), card_rect)
+
+            pygame.draw.rect(surface, Color("black"), card_rect, width=2)
             text = self.card_font.render(card.type, True, Color("black"))
             text_rect = text.get_rect()
             text_rect.center = (left_x + (self.card_width / 2), top_y + (self.card_height / 2))
             text_rect.width = self.card_width
             surface.blit(text, text_rect)
-
 
     def __draw_player_clue_info(self, player, surface):
         self.__draw_clues(self.room_cards, player, surface)
