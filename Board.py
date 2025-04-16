@@ -142,9 +142,10 @@ class Board:
             return False
 
     def __draw_player(self, player, surface):
-        tile = player.current_tile
-        tile_center = (tile.top_left_corner[0] + (tile.size / 2), tile.top_left_corner[1] + (tile.size / 2))
-        pygame.draw.circle(surface, player.color, tile_center, tile.size / 2.5)
+        if player.active:
+            tile = player.current_tile
+            tile_center = (tile.top_left_corner[0] + (tile.size / 2), tile.top_left_corner[1] + (tile.size / 2))
+            pygame.draw.circle(surface, player.color, tile_center, tile.size / 2.5)
 
     def draw_board_state(self, surface):
         for row in self.board:

@@ -6,6 +6,7 @@ class Player:
         self.current_tile = start_tile
         self.hand = hand
         self.knowledge = hand.copy()
+        self.active = True
 
     def add_knowledge(self, clue):
         self.knowledge.append(clue)

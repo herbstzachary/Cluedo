@@ -166,9 +166,18 @@ class PlayerPlayArea:
                 self.current_suggestion[Enums.Characters] = card.type
                 return
 
+    def select_cards_for_accusation(self, mouse):
+        self.select_cards_for_guess(mouse)
+        for card in self.room_cards:
+            if card.rect.collidepoint(mouse):
+                self.current_suggestion[Enums.Rooms] = card.type
+                return
+
     def submit_guess(self, mouse):
-        if self.suggest_submit_button.collidepoint(mouse) and None not in self.current_suggestion.values():
-            return True
+        return self.suggest_submit_button.collidepoint(mouse) and None not in self.current_suggestion.values()
+
+    def submit_accuse(self, mouse):
+        return self.accuse_submit_button.collidepoint(mouse) and None not in self.current_suggestion.values()
 
     def skip_accuse(self, mouse):
         if self.skip_accuse_button.collidepoint(mouse):

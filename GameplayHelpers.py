@@ -58,3 +58,22 @@ def check_suggestion(players, current_player, suggestion):
             return index, clues_present[0]
 
     return None
+
+def get_next_player(players, current_player):
+    index = players.index(current_player) + 1
+    for _ in range(len(players)):
+        if index >= len(players):
+            index = 0
+
+        if players[index].active:
+            return players[index]
+        else:
+            index += 1
+
+def get_active_players(players):
+    active_players = []
+    for player in players:
+        if player.active:
+            active_players.append(player)
+
+    return active_players
