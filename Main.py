@@ -7,6 +7,7 @@ from pygame.locals import *
 import Enums
 from Board import Board
 from GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
+from MainMenu import MainMenu
 from PlayerPlayArea import PlayerPlayArea
 from Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
 from Player import Player
@@ -20,6 +21,9 @@ SCREEN_WIDTH = screenInfo.current_w
 SCREEN_HEIGHT = screenInfo.current_h
 DISPLAY_SURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+main_menu = MainMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
+number_of_players = main_menu.run_main_menu(DISPLAY_SURF)
+
 solution = [
     list(Characters)[random.randint(0, len(Characters) - 1)],
     list(Rooms)[random.randint(0, len(Rooms) - 1)],
@@ -29,7 +33,7 @@ solution = [
 deck = create_deck(solution)
 random.shuffle(deck)
 
-player_hands = create_hands(deck, 6)
+player_hands = create_hands(deck, number_of_players)
 
 board_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
 player_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
@@ -37,13 +41,22 @@ card_font = pygame.font.SysFont('Comic Sans MS', int((20 * SCREEN_HEIGHT) / 1600
 
 board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, board_font)
 players = [
-    Player(Characters.SCARLET, Color("darkred"), board.board[24][8], player_hands[0]),
-    Player(Characters.MUSTARD, Color("yellow3"),board.board[17][1], player_hands[1]),
-    Player(Characters.WHITE, Color("white"),board.board[0][10], player_hands[2]),
-    Player(Characters.GREEN, Color("forestgreen"), board.board[0][15], player_hands[3]),
-    Player(Characters.PEACOCK, Color("mediumblue"), board.board[6][24], player_hands[4]),
-    Player(Characters.PLUM, Color("purple4"), board.board[19][24], player_hands[5])
+    Player(Characters.SCARLET, Color("darkred"), board.board[24][8]),
+    Player(Characters.MUSTARD, Color("yellow3"),board.board[17][1]),
+    Player(Characters.WHITE, Color("white"),board.board[0][10]),
+    Player(Characters.GREEN, Color("forestgreen"), board.board[0][15]),
+    Player(Characters.PEACOCK, Color("mediumblue"), board.board[6][24]),
+    Player(Characters.PLUM, Color("purple4"), board.board[19][24])
 ]
+random.shuffle(players)
+while len(players) > number_of_players:
+    players.pop()
+
+hand_index = 0
+for player in players:
+    player.set_hand(player_hands[hand_index])
+    hand_index += 1
+
 board.players = players
 
 player_area = PlayerPlayArea(player_font, card_font, 0, SCREEN_WIDTH / 2)
@@ -142,9 +155,9 @@ while True:
 
     default_winner = get_active_players(players)
     if len(default_winner) == 1:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + default_winner[0].character.value + " is the winner due to everyone else being eliminated!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(default_winner[0].character.value + " is the winner due to everyone else being eliminated!", True, Color("Black"))
     else:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + current_player.character.value + " is the winner due to guessing the correct solution!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(current_player.character.value + " is the winner due to guessing the correct solution!", True, Color("Black"))
 
     winner_text_rect = winner_text.get_rect()
     winner_text_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
