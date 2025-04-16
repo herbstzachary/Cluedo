@@ -61,6 +61,7 @@ while not game_over:
             if current_player_phase == TurnPhases.MOVE:
                 valid_move = board.move_player_if_valid(current_player, pos)
                 if valid_move:
+                    player_area.eliminated_player = None
                     if current_player.current_tile.tile_type == TileTypes.ROOM:
                         current_player_phase = TurnPhases.SUGGEST
                         player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(current_player.current_tile)
@@ -96,6 +97,7 @@ while not game_over:
                         index = players.index(current_player)
                         players[index].active = False
                         current_player.current_tile.occupied = False
+                        player_area.eliminated_player = current_player
                         if len(get_active_players(players)) == 1:
                             game_over = True
 
@@ -104,7 +106,7 @@ while not game_over:
                     advance = True
 
                 if advance:
-                    player_area.player_that_revealed_info = -1
+                    player_area.player_that_revealed_info = None
                     player_area.clear_suggestion()
                     current_player = get_next_player(players, current_player)
                     current_player_phase = TurnPhases.MOVE
@@ -140,9 +142,9 @@ while True:
 
     default_winner = get_active_players(players)
     if len(default_winner) == 1:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + str(players.index(default_winner[0])) + " is the winner due to everyone else being eliminated!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + default_winner[0].character.value + " is the winner due to everyone else being eliminated!", True, Color("Black"))
     else:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + str(players.index(current_player)) + " is the winner due to guessing the correct solution!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 60).render("Player " + current_player.character.value + " is the winner due to guessing the correct solution!", True, Color("Black"))
 
     winner_text_rect = winner_text.get_rect()
     winner_text_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)

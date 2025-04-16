@@ -55,7 +55,7 @@ def check_suggestion(players, current_player, suggestion):
                 index += 1
         else:
             random.shuffle(clues_present)
-            return index, clues_present[0]
+            return players[index], clues_present[0]
 
     return None
 

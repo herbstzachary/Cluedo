@@ -48,8 +48,6 @@ class PlayerPlayArea:
         self.skip_accuse_button.right = self.phase_info_area.right
         self.skip_accuse_button.top = self.phase_info_area.top
 
-        self.player_that_revealed_info = -1
-
         top_y = self.phase_info_area.bottom + self.y_margin
         left_x = self.x_start + self.x_margin
         self.card_width = int((self.width - (self.x_margin * 5)) / 7)
@@ -65,6 +63,9 @@ class PlayerPlayArea:
         left_x += weapon_cards_area.width + self.x_margin
         character_cards_area = Rect(left_x, top_y, (self.card_width * 2) + self.x_margin, self.card_height * 3)
         self.character_cards = self.__create_cards(character_cards_area, Enums.Characters)
+
+        self.player_that_revealed_info = None
+        self.eliminated_player = None
 
     def __create_cards(self, area, category):
         cards = []
@@ -87,9 +88,17 @@ class PlayerPlayArea:
 
     def __draw_current_turn_text(self, player, phase, surface):
         if phase == TurnPhases.MOVE:
+            move_text_center_x = self.phase_info_area.centerx
+            if self.eliminated_player is not None:
+                eliminated_text = self.top_font.render(self.eliminated_player.character.value + " was eliminated.", True, Color("black"))
+                eliminated_text_rect = eliminated_text.get_rect()
+                eliminated_text_rect.left = self.phase_info_area.left
+                eliminated_text_rect.top = self.phase_info_area.top
+                surface.blit(eliminated_text, eliminated_text_rect)
+                move_text_center_x = (eliminated_text_rect.right + self.phase_info_area.right) / 2
             text = self.top_font.render(player.character.value + "'s " + phase + " Phase", True, Color("black"))
             text_rect = text.get_rect()
-            text_rect.center = (self.x_start + (self.width / 2), (text_rect.height / 2))
+            text_rect.center = (move_text_center_x, self.phase_info_area.centery)
             surface.blit(text, text_rect)
         elif phase == TurnPhases.SUGGEST:
             text_rect = self.suggest_submit_button
@@ -107,9 +116,9 @@ class PlayerPlayArea:
             pygame.draw.rect(surface, Color("black"), self.accuse_submit_button, width=1)
             surface.blit(self.accuse_text, self.accuse_submit_button)
 
-            if self.player_that_revealed_info >= 0:
+            if self.player_that_revealed_info is not None:
                 revealed_text = self.top_font.render(
-                    "Player " + str(self.player_that_revealed_info + 1) + " revealed " + player.knowledge[-1].value,
+                    "Player " + self.player_that_revealed_info + " revealed " + player.knowledge[-1].value,
                     True,
                     Color("black")
                 )
