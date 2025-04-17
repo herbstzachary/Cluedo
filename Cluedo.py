@@ -37,7 +37,7 @@ random.shuffle(deck)
 
 player_hands = create_hands(deck, number_of_players)
 
-board_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
+board_font = pygame.font.Font("./resources/FuturaRenner-Regular.otf", int((40 * SCREEN_HEIGHT) / 1600))
 player_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
 card_font = pygame.font.SysFont('Comic Sans MS', int((20 * SCREEN_HEIGHT) / 1600))
 

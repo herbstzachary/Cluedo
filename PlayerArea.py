@@ -66,17 +66,17 @@ class PlayerArea:
             card_rect = Rect(left_x, top_y, self.card_width, self.card_height)
             pygame.draw.rect(surface, WHITE, card_rect)
 
-            if card.type in player.knowledge:
+            if card.card_type in player.knowledge:
                 pygame.draw.rect(surface, RED, card_rect)
 
-            if card.type in player.hand:
+            if card.card_type in player.hand:
                 pygame.draw.rect(surface, YELLOW, card_rect)
 
-            if card.type in self.current_suggestion.values():
+            if card.card_type in self.current_suggestion.values():
                 pygame.draw.rect(surface, BLUE, card_rect)
 
             pygame.draw.rect(surface, BLACK, card_rect, width=2)
-            text = self.card_font.render(card.type, True, BLACK)
+            text = self.card_font.render(card.card_type, True, BLACK)
             text_rect = text.get_rect()
             text_rect.center = (left_x + (self.card_width / 2), top_y + (self.card_height / 2))
             text_rect.width = self.card_width
@@ -94,17 +94,17 @@ class PlayerArea:
         if phase == TurnPhases.ACCUSE:
             for card in self.room_cards:
                 if card.rect.collidepoint(mouse):
-                    self.current_suggestion[Enums.Rooms] = card.type
+                    self.current_suggestion[Enums.Rooms] = card.card_type
                     return
 
         for card in self.weapon_cards:
             if card.rect.collidepoint(mouse):
-                self.current_suggestion[Enums.Weapons] = card.type
+                self.current_suggestion[Enums.Weapons] = card.card_type
                 return
 
         for card in self.character_cards:
             if card.rect.collidepoint(mouse):
-                self.current_suggestion[Enums.Characters] = card.type
+                self.current_suggestion[Enums.Characters] = card.card_type
                 return
 
     def clear_suggestion(self):

@@ -1,4 +1,4 @@
 class Card:
-    def __init__(self, rect, type):
+    def __init__(self, rect, card_type):
         self.rect = rect
-        self.type = type
+        self.card_type = card_type
