@@ -5,17 +5,16 @@ from Enums import TileTypes
 from Rooms import *
 from Tile import Tile
 
-class Board:
-    def __init__(self, screen_width, screen_height, number_of_tiles, board_font):
+class GameBoard:
+    def __init__(self, area, number_of_tiles_in_row, board_font):
+        self.area = area
 
-        board_space = min(screen_width / 2, screen_height)
-        self.tile_size = int(board_space / number_of_tiles)
-        board_size = self.tile_size * number_of_tiles
-        board_horizontal_margin = (screen_width / 2 - board_size) / 2
-        board_vertical_margin = (screen_height - board_size) / 2
-        self.board_top_left = (screen_width / 2 + board_horizontal_margin, board_vertical_margin)
+        smaller_dimension = min(area.width, area.height)
+        self.tile_size = int(smaller_dimension / number_of_tiles_in_row)
+        board_vertical_margin = (area.height - smaller_dimension) / 2
+        self.board_top_left = (area.left, board_vertical_margin)
 
-        self.board = [[Tile(self.tile_size, x, y, self.board_top_left) for x in range(number_of_tiles)] for y in range(number_of_tiles)]
+        self.board = [[Tile(self.tile_size, x, y, self.board_top_left) for x in range(number_of_tiles_in_row)] for y in range(number_of_tiles_in_row)]
 
         self.rooms = [
             Kitchen(),

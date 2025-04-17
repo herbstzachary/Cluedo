@@ -5,21 +5,22 @@ import pygame, sys
 from pygame.locals import *
 
 import Enums
-from Board import Board
+from GameBoard import GameBoard
+from GameStateInformationArea import GameStateInformationArea
 from GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
 from MainMenu import MainMenu
-from PlayerPlayArea import PlayerPlayArea
+from PlayerArea import PlayerArea
 from Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
 from Player import Player
 
 # Initializing
 pygame.init()
 
-NUMBER_OF_TILES = 26
-screenInfo = pygame.display.Info()
-SCREEN_WIDTH = screenInfo.current_w
-SCREEN_HEIGHT = screenInfo.current_h
-DISPLAY_SURF = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+NUMBER_OF_TILES_IN_ROW = 26
+DISPLAY_SURF = pygame.display.set_mode()
+SCREEN_WIDTH, SCREEN_HEIGHT = DISPLAY_SURF.get_size()
+x_margin = SCREEN_WIDTH / 100
+y_margin = SCREEN_HEIGHT / 100
 
 main_menu = MainMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 number_of_players = main_menu.run_main_menu(DISPLAY_SURF)
@@ -39,7 +40,40 @@ board_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 160
 player_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
 card_font = pygame.font.SysFont('Comic Sans MS', int((20 * SCREEN_HEIGHT) / 1600))
 
-board = Board(SCREEN_WIDTH, SCREEN_HEIGHT, NUMBER_OF_TILES, board_font)
+# Upper portion of game screen
+info_area = GameStateInformationArea(
+    Rect(
+        x_margin,
+        y_margin,
+        SCREEN_WIDTH - (2 * x_margin),
+        player_font.get_linesize()
+    ),
+    player_font
+)
+
+# Left hand side of screen, below information area
+player_area = PlayerArea(
+    Rect(
+        x_margin,
+        info_area.area.bottom + y_margin,
+        (SCREEN_WIDTH / 2) - (x_margin * 2),
+        SCREEN_HEIGHT - info_area.area.bottom - (2 * y_margin)
+    ),
+    card_font
+)
+
+# Right hand side of screen, below information area
+board = GameBoard(
+    Rect(
+        player_area.area.right + (2 * x_margin),
+        info_area.area.bottom + y_margin,
+        player_area.area.width,
+        player_area.area.height
+    ),
+    NUMBER_OF_TILES_IN_ROW,
+    board_font
+)
+
 players = [
     Player(Characters.SCARLET, Color("darkred"), board.board[24][8]),
     Player(Characters.MUSTARD, Color("yellow3"),board.board[17][1]),
@@ -59,7 +93,6 @@ for player in players:
 
 board.players = players
 
-player_area = PlayerPlayArea(player_font, card_font, 0, SCREEN_WIDTH / 2)
 current_player = players[0]
 board.draw_board_state(DISPLAY_SURF)
 current_player_phase = TurnPhases.MOVE
@@ -74,28 +107,28 @@ while not game_over:
             if current_player_phase == TurnPhases.MOVE:
                 valid_move = board.move_player_if_valid(current_player, pos)
                 if valid_move:
-                    player_area.eliminated_player = None
+                    info_area.eliminated_player = None
                     if current_player.current_tile.tile_type == TileTypes.ROOM:
                         current_player_phase = TurnPhases.SUGGEST
                         player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(current_player.current_tile)
                     else:
                         current_player_phase = TurnPhases.ACCUSE
             elif current_player_phase == TurnPhases.SUGGEST:
-                player_area.select_cards_for_guess(pos)
-                if player_area.submit_guess(pos):
+                player_area.select_card_for_guess(pos, current_player_phase)
+                if info_area.submit_guess(pos, player_area.current_suggestion):
                     suggestion = player_area.current_suggestion
                     new_knowledge = check_suggestion(players, current_player, suggestion)
 
                     if new_knowledge is not None:
-                        player_area.player_that_revealed_info = new_knowledge[0]
+                        info_area.player_that_revealed_info = new_knowledge[0]
                         current_player.add_knowledge(new_knowledge[1])
 
                     current_player_phase = TurnPhases.ACCUSE
                     player_area.clear_suggestion()
             elif current_player_phase == TurnPhases.ACCUSE:
                 advance = False
-                player_area.select_cards_for_accusation(pos)
-                if player_area.submit_accuse(pos):
+                player_area.select_card_for_guess(pos, current_player_phase)
+                if info_area.submit_accuse(pos, player_area.current_suggestion):
                     advance = True
                     accusation = player_area.current_suggestion
                     is_correct = True
@@ -110,16 +143,16 @@ while not game_over:
                         index = players.index(current_player)
                         players[index].active = False
                         current_player.current_tile.occupied = False
-                        player_area.eliminated_player = current_player
+                        info_area.eliminated_player = current_player
                         if len(get_active_players(players)) == 1:
                             game_over = True
 
 
-                if player_area.skip_accuse(pos):
+                if info_area.skip_accuse(pos):
                     advance = True
 
                 if advance:
-                    player_area.player_that_revealed_info = None
+                    info_area.player_that_revealed_info = None
                     player_area.clear_suggestion()
                     current_player = get_next_player(players, current_player)
                     current_player_phase = TurnPhases.MOVE
@@ -137,7 +170,8 @@ while not game_over:
 
     DISPLAY_SURF.fill(Color("white"))
     board.draw_board_state(DISPLAY_SURF)
-    player_area.draw_player_play_area(current_player, current_player_phase, DISPLAY_SURF)
+    player_area.draw_player_play_area(current_player, current_player_phase, move_number, DISPLAY_SURF)
+    info_area.draw_info_area(current_player, current_player_phase, move_number, player_area.current_suggestion, DISPLAY_SURF)
     pygame.display.update()
 
 while True:
