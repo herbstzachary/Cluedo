@@ -1,7 +1,9 @@
 import sys
 
 import pygame.sysfont
-from pygame import Color, QUIT, Rect
+from pygame import QUIT, Rect
+
+from Colors import WHITE, BLACK
 
 
 class MainMenu:
@@ -11,11 +13,11 @@ class MainMenu:
         select_font = pygame.sysfont.SysFont("Times New Roman", 50)
         button_font = pygame.sysfont.SysFont("Times New Roman", 30)
 
-        self.title_text = title_font.render("Cluedo", True, Color("black"))
+        self.title_text = title_font.render("Cluedo", True, BLACK)
         self.title_text_rect = self.title_text.get_rect()
         self.title_text_rect.center = (screen_width / 2, screen_height / 4)
 
-        self.select_text = select_font.render("Please select the number of players:", True, Color("Black"))
+        self.select_text = select_font.render("Please select the number of players:", True, BLACK)
         self.select_text_rect = self.select_text.get_rect()
         self.select_text_rect.center = (screen_width / 2, screen_height / 2)
 
@@ -33,7 +35,7 @@ class MainMenu:
                 button_width,
                 button_height)
 
-            button_text = button_font.render(str(i), True, Color("Black"))
+            button_text = button_font.render(str(i), True, BLACK)
             rect = button_text.get_rect()
             rect.center = outline_rect.center
             self.buttons.append((button_text, rect, outline_rect))
@@ -57,10 +59,10 @@ class MainMenu:
                     pygame.quit()
                     sys.exit()
 
-            surface.fill(Color("white"))
+            surface.fill(WHITE)
             surface.blit(self.title_text, self.title_text_rect)
             surface.blit(self.select_text, self.select_text_rect)
             for button in self.buttons:
                 surface.blit(button[0], button[1])
-                pygame.draw.rect(surface, Color("black"), button[2], width=1)
+                pygame.draw.rect(surface, BLACK, button[2], width=1)
             pygame.display.update()

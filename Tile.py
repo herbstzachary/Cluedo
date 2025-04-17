@@ -1,6 +1,7 @@
 import pygame.draw
-from pygame import Color, Rect
+from pygame import Rect
 
+from Colors import BLACK, BOARD_HALLWAY_TILE_COLOR, BOARD_ROOM_TILE_COLOR, BOARD_MOVE_CANDIDATE_TILE_COLOR
 from Enums import TileTypes, EntranceDirections
 
 class Tile:
@@ -19,15 +20,11 @@ class Tile:
         y_coord = self.top_left_corner[1]
 
         if self.move_candidate:
-            pygame.draw.rect(surface, Color("orange2"), Rect(x_coord, y_coord, self.size, self.size))
-            pygame.draw.rect(surface, Color(210, 180, 140), Rect(x_coord, y_coord, self.size, self.size), width=1)
+            pygame.draw.rect(surface, BOARD_MOVE_CANDIDATE_TILE_COLOR, Rect(x_coord, y_coord, self.size, self.size))
+            pygame.draw.rect(surface, BLACK, Rect(x_coord, y_coord, self.size, self.size), width=1)
         elif self.tile_type == TileTypes.HALLWAY:
-            pygame.draw.rect(surface, Color(100, 100, 100), Rect(x_coord, y_coord, self.size, self.size))
-            pygame.draw.rect(surface, Color(210, 180, 140), Rect(x_coord, y_coord, self.size, self.size), width=1)
-        elif self.tile_type == TileTypes.ROOM_ENTRANCE:
-            pygame.draw.rect(surface, Color(0, 255, 0), Rect(x_coord, y_coord, self.size, self.size))
-        elif self.tile_type == TileTypes.ROOM:
-            pygame.draw.rect(surface, Color(0, 0, 255), Rect(x_coord, y_coord, self.size, self.size))
-        else:
-            pygame.draw.rect(surface, Color("white"), Rect(x_coord, y_coord, self.size, self.size))
+            pygame.draw.rect(surface, BOARD_HALLWAY_TILE_COLOR, Rect(x_coord, y_coord, self.size, self.size))
+            pygame.draw.rect(surface, BLACK, Rect(x_coord, y_coord, self.size, self.size), width=1)
+        elif self.tile_type == TileTypes.ROOM_ENTRANCE or self.tile_type == TileTypes.ROOM:
+            pygame.draw.rect(surface, BOARD_ROOM_TILE_COLOR, Rect(x_coord, y_coord, self.size, self.size))
 

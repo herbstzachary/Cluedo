@@ -1,8 +1,9 @@
 import pygame
-from pygame import Color, Rect
+from pygame import Rect
 
 import Enums
 from Card import Card
+from Colors import RED, YELLOW, BLUE, BLACK, WHITE
 from Enums import TurnPhases
 
 
@@ -63,18 +64,19 @@ class PlayerArea:
             left_x = card.rect.left
             top_y = card.rect.top
             card_rect = Rect(left_x, top_y, self.card_width, self.card_height)
+            pygame.draw.rect(surface, WHITE, card_rect)
 
             if card.type in player.knowledge:
-                pygame.draw.rect(surface, Color("red"), card_rect)
+                pygame.draw.rect(surface, RED, card_rect)
 
             if card.type in player.hand:
-                pygame.draw.rect(surface, Color("yellow"), card_rect)
+                pygame.draw.rect(surface, YELLOW, card_rect)
 
             if card.type in self.current_suggestion.values():
-                pygame.draw.rect(surface, Color("blue"), card_rect)
+                pygame.draw.rect(surface, BLUE, card_rect)
 
-            pygame.draw.rect(surface, Color("black"), card_rect, width=2)
-            text = self.card_font.render(card.type, True, Color("black"))
+            pygame.draw.rect(surface, BLACK, card_rect, width=2)
+            text = self.card_font.render(card.type, True, BLACK)
             text_rect = text.get_rect()
             text_rect.center = (left_x + (self.card_width / 2), top_y + (self.card_height / 2))
             text_rect.width = self.card_width

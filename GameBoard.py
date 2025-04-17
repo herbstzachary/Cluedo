@@ -1,6 +1,7 @@
 import pygame
-from pygame import Color, Surface
+from pygame import Surface, Rect
 
+from Colors import BOARD_BACKGROUND_COLOR, BLACK, BOARD_WALL_COLOR
 from Enums import TileTypes
 from Rooms import *
 from Tile import Tile
@@ -11,8 +12,10 @@ class GameBoard:
 
         smaller_dimension = min(area.width, area.height)
         self.tile_size = int(smaller_dimension / number_of_tiles_in_row)
-        board_vertical_margin = (area.height - smaller_dimension) / 2
-        self.board_top_left = (area.left, board_vertical_margin)
+        self.board_side_length = self.tile_size * number_of_tiles_in_row
+        board_vertical_padding = (area.height - self.board_side_length) / 2
+        board_horizontal_padding = (area.width - self.board_side_length) / 2
+        self.board_top_left = (area.left + board_horizontal_padding, area.top + board_vertical_padding)
 
         self.board = [[Tile(self.tile_size, x, y, self.board_top_left) for x in range(number_of_tiles_in_row)] for y in range(number_of_tiles_in_row)]
 
@@ -83,6 +86,7 @@ class GameBoard:
                 self.board[entrance[1]][entrance[0]].entrance_direction = entrance[2]
 
     def __draw_walls(self, surface):
+        wall_color = BOARD_WALL_COLOR
         for y in range(0, len(self.board)):
             for x in range(0, len(self.board[y])):
                 current_tile = self.board[y][x]
@@ -93,13 +97,13 @@ class GameBoard:
                 top_right_corner = (left_x + tile_size, top_y)
                 bottom_left_corner = (left_x, top_y + tile_size)
                 bottom_right_corner = (left_x + tile_size, top_y + tile_size)
-                border_width = 3
+                border_width = 4
 
                 if current_tile.tile_type != TileTypes.EMPTY and current_tile.tile_type != TileTypes.ROOM_ENTRANCE:
                     if y == 0 or self.__should_draw_wall(current_tile, self.board[y - 1][x], EntranceDirections.SOUTH):
                         pygame.draw.line(
                             surface,
-                            Color(0, 0, 0),
+                            wall_color,
                             top_left_corner,
                             top_right_corner,
                             border_width
@@ -107,7 +111,7 @@ class GameBoard:
                     if x == 0 or self.__should_draw_wall(current_tile, self.board[y][x - 1], EntranceDirections.EAST):
                         pygame.draw.line(
                             surface,
-                            Color(0, 0, 0),
+                            wall_color,
                             top_left_corner,
                             bottom_left_corner,
                             border_width
@@ -115,7 +119,7 @@ class GameBoard:
                     if y == len(self.board) - 1 or self.__should_draw_wall(current_tile, self.board[y + 1][x], EntranceDirections.NORTH):
                         pygame.draw.line(
                             surface,
-                            Color(0, 0, 0),
+                            wall_color,
                             bottom_left_corner,
                             bottom_right_corner,
                             border_width
@@ -123,7 +127,7 @@ class GameBoard:
                     if x == len(self.board[y]) - 1 or self.__should_draw_wall(current_tile, self.board[y][x + 1], EntranceDirections.WEST):
                         pygame.draw.line(
                             surface,
-                            Color(0, 0, 0),
+                            wall_color,
                             top_right_corner,
                             bottom_right_corner,
                             border_width
@@ -147,13 +151,17 @@ class GameBoard:
             pygame.draw.circle(surface, player.color, tile_center, tile.size / 2.5)
 
     def draw_board_state(self, surface):
+        background = Rect(self.board_top_left[0], self.board_top_left[1] - self.tile_size, self.board_side_length, self.board_side_length + self.tile_size)
+        pygame.draw.rect(surface, BOARD_BACKGROUND_COLOR, background)
+        pygame.draw.rect(surface, BLACK, background, width=2)
+
         for row in self.board:
             for tile in row:
                 tile.draw(surface)
 
         for room in self.rooms:
             tile_drawing_over = self.board[room.center[1]][room.center[0]]
-            text = self.board_font.render(room.type, True, Color("white"))
+            text = self.board_font.render(room.type, True, BLACK)
             text_rect = text.get_rect()
             text_rect.center = (tile_drawing_over.top_left_corner[0], tile_drawing_over.top_left_corner[1])
             surface.blit(text, text_rect)

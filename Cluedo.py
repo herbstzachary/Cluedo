@@ -5,6 +5,7 @@ import pygame, sys
 from pygame.locals import *
 
 import Enums
+from Colors import *
 from GameBoard import GameBoard
 from GameStateInformationArea import GameStateInformationArea
 from GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
@@ -75,12 +76,12 @@ board = GameBoard(
 )
 
 players = [
-    Player(Characters.SCARLET, Color("darkred"), board.board[24][8]),
-    Player(Characters.MUSTARD, Color("yellow3"),board.board[17][1]),
-    Player(Characters.WHITE, Color("white"),board.board[0][10]),
-    Player(Characters.GREEN, Color("forestgreen"), board.board[0][15]),
-    Player(Characters.PEACOCK, Color("mediumblue"), board.board[6][24]),
-    Player(Characters.PLUM, Color("purple4"), board.board[19][24])
+    Player(Characters.SCARLET, CHARACTER_SCARLET, board.board[24][8]),
+    Player(Characters.MUSTARD, CHARACTER_MUSTARD, board.board[17][1]),
+    Player(Characters.WHITE, CHARACTER_WHITE,board.board[0][10]),
+    Player(Characters.GREEN, CHARACTER_GREEN, board.board[0][15]),
+    Player(Characters.PEACOCK, CHARACTER_PEACOCK, board.board[6][24]),
+    Player(Characters.PLUM, CHARACTER_PLUM, board.board[19][24])
 ]
 random.shuffle(players)
 while len(players) > number_of_players:
@@ -99,6 +100,9 @@ current_player_phase = TurnPhases.MOVE
 move_number = random.randint(1, 6) + random.randint(1, 6)
 board.get_move_candidates(current_player.current_tile, move_number)
 game_over = False
+
+wood = pygame.image.load("./resources/wood.jpeg")
+wood = pygame.transform.scale(wood, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 while not game_over:
     for event in pygame.event.get():
@@ -168,7 +172,8 @@ while not game_over:
             pygame.quit()
             sys.exit()
 
-    DISPLAY_SURF.fill(Color("white"))
+    DISPLAY_SURF.fill(WHITE)
+    DISPLAY_SURF.blit(wood, wood.get_rect())
     board.draw_board_state(DISPLAY_SURF)
     player_area.draw_player_play_area(current_player, current_player_phase, move_number, DISPLAY_SURF)
     info_area.draw_info_area(current_player, current_player_phase, move_number, player_area.current_suggestion, DISPLAY_SURF)
@@ -185,13 +190,13 @@ while True:
             pygame.quit()
             sys.exit()
 
-    DISPLAY_SURF.fill(Color("white"))
+    DISPLAY_SURF.fill(WHITE)
 
     default_winner = get_active_players(players)
     if len(default_winner) == 1:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(default_winner[0].character.value + " is the winner due to everyone else being eliminated!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(default_winner[0].character.value + " is the winner due to everyone else being eliminated!", True, BLACK)
     else:
-        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(current_player.character.value + " is the winner due to guessing the correct solution!", True, Color("Black"))
+        winner_text = pygame.sysfont.SysFont('Comic Sans MS', 50).render(current_player.character.value + " is the winner due to guessing the correct solution!", True, BLACK)
 
     winner_text_rect = winner_text.get_rect()
     winner_text_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
