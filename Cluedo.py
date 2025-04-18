@@ -121,11 +121,20 @@ while not game_over:
                 player_area.select_card_for_guess(pos, current_player_phase)
                 if info_area.submit_guess(pos, player_area.current_suggestion):
                     suggestion = player_area.current_suggestion
+
+                    if current_player not in player_area.room_cards.get(suggestion.get(Rooms)).guessed:
+                        player_area.room_cards.get(suggestion.get(Rooms)).guessed.append(current_player)
+
+                    if current_player not in player_area.weapon_cards.get(suggestion.get(Weapons)).guessed:
+                        player_area.weapon_cards.get(suggestion.get(Weapons)).guessed.append(current_player)
+
+                    if current_player not in player_area.character_cards.get(suggestion.get(Characters)).guessed:
+                        player_area.character_cards.get(suggestion.get(Characters)).guessed.append(current_player)
+
                     new_knowledge = check_suggestion(players, current_player, suggestion)
 
                     if new_knowledge is not None:
-                        info_area.player_that_revealed_info = new_knowledge[0]
-                        current_player.add_knowledge(new_knowledge[1])
+                        current_player.add_knowledge(new_knowledge)
 
                     current_player_phase = TurnPhases.ACCUSE
                     player_area.clear_suggestion()

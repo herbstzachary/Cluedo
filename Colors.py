@@ -6,6 +6,9 @@ BOARD_HALLWAY_TILE_COLOR = Color("wheat3")
 BOARD_ROOM_TILE_COLOR = Color("wheat4")
 BOARD_MOVE_CANDIDATE_TILE_COLOR = Color("springgreen")
 
+CARD_BACKGROUND_COLOR = Color("gray67")
+HAND_CARD_BACKGROUND_COLOR = Color("darksalmon")
+
 BLACK = Color("black")
 GREY = Color("grey")
 GREEN = Color("green")

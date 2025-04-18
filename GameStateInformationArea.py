@@ -25,7 +25,6 @@ class GameStateInformationArea:
         self.skip_accuse_button.right = area.right
         self.skip_accuse_button.top = area.top
 
-        self.player_that_revealed_info = None
         self.eliminated_player = None
 
     def draw_info_area(self, player, phase, move_amount, guess, surface):
@@ -57,17 +56,6 @@ class GameStateInformationArea:
                 pygame.draw.rect(surface, GREEN, self.accuse_submit_button)
             pygame.draw.rect(surface, BLACK, self.accuse_submit_button, width=1)
             surface.blit(self.accuse_text, self.accuse_submit_button)
-
-            if self.player_that_revealed_info is not None:
-                revealed_text = self.font.render(
-                    self.player_that_revealed_info.character.value + " revealed " + player.knowledge[-1].value,
-                    True,
-                    BLACK
-                )
-                revealed_text_rect = revealed_text.get_rect()
-                revealed_text_rect.centerx = (self.skip_accuse_button.left + self.accuse_submit_button.right) / 2
-                revealed_text_rect.top = self.area.top
-                surface.blit(revealed_text, revealed_text_rect)
 
             pygame.draw.rect(surface, GREEN, self.skip_accuse_button)
             pygame.draw.rect(surface, BLACK, self.skip_accuse_button, width=1)

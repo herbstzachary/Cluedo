@@ -3,7 +3,7 @@ from pygame import Rect
 
 import Enums
 from Card import Card
-from Colors import RED, YELLOW, BLUE, BLACK, WHITE
+from Colors import RED, YELLOW, BLUE, BLACK, WHITE, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR
 from Enums import TurnPhases
 
 
@@ -41,14 +41,14 @@ class PlayerArea:
         self.character_cards = self.__create_cards(character_cards_area, Enums.Characters)
 
     def __create_cards(self, area, category):
-        cards = []
+        cards = {}
         top = area.top
         left = area.left
         counter = 0
 
         for card in category:
             rect = Rect(left, top, self.card_width, self.card_height)
-            cards.append(Card(rect, card))
+            cards[card] = Card(rect)
             if counter < (len(category) / 3) - 1:
                 left += self.card_width
                 counter += 1
@@ -60,27 +60,47 @@ class PlayerArea:
         return cards
 
     def __draw_clues(self, cards, player, surface):
-        for card in cards:
+        for card_type in cards:
+            card = cards.get(card_type)
             left_x = card.rect.left
             top_y = card.rect.top
-            card_rect = Rect(left_x, top_y, self.card_width, self.card_height)
-            pygame.draw.rect(surface, WHITE, card_rect)
 
-            if card.card_type in player.knowledge:
-                pygame.draw.rect(surface, RED, card_rect)
+            text = self.card_font.render(card_type, True, BLACK)
+            additional_text = None
 
-            if card.card_type in player.hand:
-                pygame.draw.rect(surface, YELLOW, card_rect)
+            if card_type in self.current_suggestion.values():
+                pygame.draw.rect(surface, BLUE, card.rect)
+            elif card_type in player.hand:
+                pygame.draw.rect(surface, HAND_CARD_BACKGROUND_COLOR, card.rect)
+            elif card_type in player.knowledge.keys():
+                pygame.draw.rect(surface, RED, card.rect)
+                additional_text = self.card_font.render("(" + player.knowledge[card_type].character.value + ")", True, BLACK)
+            else:
+                pygame.draw.rect(surface, CARD_BACKGROUND_COLOR, card.rect)
 
-            if card.card_type in self.current_suggestion.values():
-                pygame.draw.rect(surface, BLUE, card_rect)
+            guess_radius = (card.rect.width / 9)
+            guess_center_x = card.rect.left + guess_radius + 5
+            guess_center_y = card.rect.top + guess_radius + 5
+            count = 0
+            for guess in card.guessed:
+                pygame.draw.circle(surface, guess.color, (guess_center_x, guess_center_y), guess_radius)
+                guess_center_x += guess_radius * 3
+                if count >= 2:
+                    guess_center_x = card.rect.left + guess_radius + 5
+                    guess_center_y += guess_radius * 2
+                    count = 0
+                else:
+                    count += 1
 
-            pygame.draw.rect(surface, BLACK, card_rect, width=2)
-            text = self.card_font.render(card.card_type, True, BLACK)
+            pygame.draw.rect(surface, BLACK, card.rect, width=2)
             text_rect = text.get_rect()
             text_rect.center = (left_x + (self.card_width / 2), top_y + (self.card_height / 2))
-            text_rect.width = self.card_width
             surface.blit(text, text_rect)
+
+            if additional_text is not None:
+                additional_text_rect = additional_text.get_rect()
+                additional_text_rect.center = (text_rect.centerx, text_rect.bottom + (additional_text_rect.height / 2))
+                surface.blit(additional_text, additional_text_rect)
 
     def __draw_player_clue_info(self, player, surface):
         self.__draw_clues(self.room_cards, player, surface)
@@ -92,19 +112,25 @@ class PlayerArea:
 
     def select_card_for_guess(self, mouse, phase):
         if phase == TurnPhases.ACCUSE:
-            for card in self.room_cards:
+            for entry in self.room_cards.items():
+                card_type = entry[0]
+                card = entry[1]
                 if card.rect.collidepoint(mouse):
-                    self.current_suggestion[Enums.Rooms] = card.card_type
+                    self.current_suggestion[Enums.Rooms] = card_type
                     return
 
-        for card in self.weapon_cards:
+        for entry in self.weapon_cards.items():
+            card_type = entry[0]
+            card = entry[1]
             if card.rect.collidepoint(mouse):
-                self.current_suggestion[Enums.Weapons] = card.card_type
+                self.current_suggestion[Enums.Weapons] = card_type
                 return
 
-        for card in self.character_cards:
+        for entry in self.character_cards.items():
+            card_type = entry[0]
+            card = entry[1]
             if card.rect.collidepoint(mouse):
-                self.current_suggestion[Enums.Characters] = card.card_type
+                self.current_suggestion[Enums.Characters] = card_type
                 return
 
     def clear_suggestion(self):

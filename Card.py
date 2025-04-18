@@ -1,4 +1,4 @@
 class Card:
-    def __init__(self, rect, card_type):
+    def __init__(self, rect):
         self.rect = rect
-        self.card_type = card_type
+        self.guessed = []
