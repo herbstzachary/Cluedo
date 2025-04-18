@@ -22,6 +22,8 @@ DISPLAY_SURF = pygame.display.set_mode()
 SCREEN_WIDTH, SCREEN_HEIGHT = DISPLAY_SURF.get_size()
 x_margin = SCREEN_WIDTH / 100
 y_margin = SCREEN_HEIGHT / 100
+horizontal_text_padding = SCREEN_WIDTH / 200
+vertical_text_padding = SCREEN_HEIGHT / 200
 
 main_menu = MainMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 number_of_players = main_menu.run_main_menu(DISPLAY_SURF)
@@ -47,9 +49,11 @@ info_area = GameStateInformationArea(
         x_margin,
         y_margin,
         SCREEN_WIDTH - (2 * x_margin),
-        player_font.get_linesize()
+        player_font.get_linesize() + (vertical_text_padding * 2)
     ),
-    player_font
+    player_font,
+    horizontal_text_padding,
+    vertical_text_padding
 )
 
 # Left hand side of screen, below information area
