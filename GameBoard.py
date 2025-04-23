@@ -90,13 +90,7 @@ class GameBoard:
         for y in range(0, len(self.board)):
             for x in range(0, len(self.board[y])):
                 current_tile = self.board[y][x]
-                tile_size = current_tile.size
-                left_x = current_tile.top_left_corner[0]
-                top_y = current_tile.top_left_corner[1]
-                top_left_corner = current_tile.top_left_corner
-                top_right_corner = (left_x + tile_size, top_y)
-                bottom_left_corner = (left_x, top_y + tile_size)
-                bottom_right_corner = (left_x + tile_size, top_y + tile_size)
+                tile_area = current_tile.rect
                 border_width = 4
 
                 if current_tile.tile_type != TileTypes.EMPTY and current_tile.tile_type != TileTypes.ROOM_ENTRANCE:
@@ -104,32 +98,32 @@ class GameBoard:
                         pygame.draw.line(
                             surface,
                             wall_color,
-                            top_left_corner,
-                            top_right_corner,
+                            tile_area.topleft,
+                            tile_area.topright,
                             border_width
                         )
                     if x == 0 or self.__should_draw_wall(current_tile, self.board[y][x - 1], EntranceDirections.EAST):
                         pygame.draw.line(
                             surface,
                             wall_color,
-                            top_left_corner,
-                            bottom_left_corner,
+                            tile_area.topleft,
+                            tile_area.bottomleft,
                             border_width
                         )
                     if y == len(self.board) - 1 or self.__should_draw_wall(current_tile, self.board[y + 1][x], EntranceDirections.NORTH):
                         pygame.draw.line(
                             surface,
                             wall_color,
-                            bottom_left_corner,
-                            bottom_right_corner,
+                            tile_area.bottomleft,
+                            tile_area.bottomright,
                             border_width
                         )
                     if x == len(self.board[y]) - 1 or self.__should_draw_wall(current_tile, self.board[y][x + 1], EntranceDirections.WEST):
                         pygame.draw.line(
                             surface,
                             wall_color,
-                            top_right_corner,
-                            bottom_right_corner,
+                            tile_area.topright,
+                            tile_area.bottomright,
                             border_width
                         )
 
@@ -147,8 +141,8 @@ class GameBoard:
     def __draw_player(self, player, surface):
         if player.active:
             tile = player.current_tile
-            tile_center = (tile.top_left_corner[0] + (tile.size / 2), tile.top_left_corner[1] + (tile.size / 2))
-            pygame.draw.circle(surface, player.color, tile_center, tile.size / 2.5)
+            tile_center = tile.rect.center
+            pygame.draw.circle(surface, player.color, tile_center, tile.rect.width / 2.5)
 
     def draw_board_state(self, surface):
         background = Rect(self.board_top_left[0], self.board_top_left[1] - self.tile_size, self.board_side_length, self.board_side_length + self.tile_size)
@@ -163,7 +157,7 @@ class GameBoard:
             tile_drawing_over = self.board[room.center[1]][room.center[0]]
             text = self.board_font.render(room.type, True, BLACK)
             text_rect = text.get_rect()
-            text_rect.center = (tile_drawing_over.top_left_corner[0], tile_drawing_over.top_left_corner[1])
+            text_rect.center = tile_drawing_over.rect.topleft
             surface.blit(text, text_rect)
 
         for player in self.players:
@@ -264,7 +258,7 @@ class GameBoard:
         selected_tile = None
         for row in self.board:
             for tile in row:
-                if tile.top_left_corner[0] <= pos[0] <= tile.top_left_corner[0] + tile.size and tile.top_left_corner[1] <= pos[1] <= tile.top_left_corner[1] + tile.size:
+                if tile.rect.collidepoint(pos):
                     selected_tile = tile
                     break
 
