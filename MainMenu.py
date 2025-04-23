@@ -5,7 +5,6 @@ from pygame import QUIT, Rect
 
 from Colors import WHITE, BLACK
 
-
 class MainMenu:
 
     def __init__(self, screen_width, screen_height):

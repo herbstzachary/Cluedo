@@ -1,5 +1,4 @@
 class Player:
-
     def __init__(self, character, color, start_tile):
         #Can only assign hands after we know how many players there are
         self.hand = None

@@ -3,9 +3,8 @@ from pygame import Rect
 
 import Enums
 from Card import Card
-from Colors import RED, YELLOW, BLUE, BLACK, WHITE, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR
+from Colors import RED, BLUE, BLACK, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR
 from Enums import TurnPhases
-
 
 class PlayerArea:
     def __init__(self, area: Rect, card_font):

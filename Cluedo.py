@@ -6,7 +6,7 @@ from pygame.locals import *
 
 import Enums
 from Colors import *
-from GameBoard import GameBoard
+from Board.GameBoard import GameBoard
 from GameStateInformationArea import GameStateInformationArea
 from GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
 from MainMenu import MainMenu

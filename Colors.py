@@ -16,6 +16,8 @@ RED = Color("red")
 YELLOW = Color("yellow")
 BLUE = Color("blue")
 WHITE = Color("white")
+PURPLE = Color("purple")
+AQUA = Color("aqua")
 
 CHARACTER_WHITE = Color("white")
 CHARACTER_SCARLET = Color("darkred")

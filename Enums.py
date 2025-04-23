@@ -4,7 +4,9 @@ class TileTypes(Enum):
     HALLWAY = 0,
     ROOM = 1,
     ROOM_ENTRANCE = 2,
-    EMPTY = 3
+    PASSAGE_ONE = 3,
+    PASSAGE_TWO = 4,
+    EMPTY = 5
 
 class EntranceDirections(Enum):
     NORTH = 0,

@@ -1,10 +1,10 @@
 import pygame
-from pygame import Surface, Rect
+from pygame import Rect
 
 from Colors import BOARD_BACKGROUND_COLOR, BLACK, BOARD_WALL_COLOR
 from Enums import TileTypes
-from Rooms import *
-from Tile import Tile
+from Board.Rooms import *
+from Board.Tile import Tile
 
 class GameBoard:
     def __init__(self, area, number_of_tiles_in_row, board_font):
@@ -34,6 +34,16 @@ class GameBoard:
 
         self.__add_blanks()
         self.__add_rooms()
+
+        # This is messy, probably a better way to add these, but I'm lazy right now
+        self.passages = {
+            TileTypes.PASSAGE_ONE: ((6, 1), (24, 21)),
+            TileTypes.PASSAGE_TWO: ((1, 19), (23, 5))
+        }
+        self.board[1][6].tile_type = TileTypes.PASSAGE_ONE
+        self.board[21][24].tile_type = TileTypes.PASSAGE_ONE
+        self.board[19][1].tile_type = TileTypes.PASSAGE_TWO
+        self.board[5][23].tile_type = TileTypes.PASSAGE_TWO
 
         self.players = None
         self.board_font = board_font
@@ -133,6 +143,11 @@ class GameBoard:
                 return False
             else:
                 return adjacent_tile_enter_from_direction != adjacent_tile.entrance_direction
+        elif adjacent_tile.tile_type == TileTypes.PASSAGE_ONE or adjacent_tile.tile_type == TileTypes.PASSAGE_TWO:
+            return False
+        elif ((current_tile.tile_type == TileTypes.PASSAGE_ONE or current_tile.tile_type == TileTypes.PASSAGE_TWO)
+              and adjacent_tile.tile_type == TileTypes.ROOM):
+            return False
         elif current_tile.tile_type != adjacent_tile.tile_type:
             return True
         else:
@@ -143,6 +158,24 @@ class GameBoard:
             tile = player.current_tile
             tile_center = tile.rect.center
             pygame.draw.circle(surface, player.color, tile_center, tile.rect.width / 2.5)
+
+    def __check_passages(self, room):
+        x, y = None, None
+        if self.passages[TileTypes.PASSAGE_ONE][0] in room.locations:
+            x = self.passages[TileTypes.PASSAGE_ONE][1][0]
+            y = self.passages[TileTypes.PASSAGE_ONE][1][1]
+        elif self.passages[TileTypes.PASSAGE_ONE][1] in room.locations:
+            x = self.passages[TileTypes.PASSAGE_ONE][0][0]
+            y = self.passages[TileTypes.PASSAGE_ONE][0][1]
+        elif self.passages[TileTypes.PASSAGE_TWO][0] in room.locations:
+            x = self.passages[TileTypes.PASSAGE_TWO][1][0]
+            y = self.passages[TileTypes.PASSAGE_TWO][1][1]
+        elif self.passages[TileTypes.PASSAGE_TWO][1] in room.locations:
+            x = self.passages[TileTypes.PASSAGE_TWO][0][0]
+            y = self.passages[TileTypes.PASSAGE_TWO][0][1]
+
+        if x is not None and y is not None:
+            self.board[y][x].move_candidate = True
 
     def draw_board_state(self, surface):
         background = Rect(self.board_top_left[0], self.board_top_left[1] - self.tile_size, self.board_side_length, self.board_side_length + self.tile_size)
@@ -174,6 +207,7 @@ class GameBoard:
             to_check.append((start_tile.x, start_tile.y, 0))
         elif start_tile.tile_type == TileTypes.ROOM:
             room = self.__get_entrances_for_room(start_tile)
+            self.__check_passages(room)
             for entrance in room.entrances:
                 self.get_move_candidates(self.board[entrance[1]][entrance[0]], max_moves)
             return
@@ -230,11 +264,10 @@ class GameBoard:
 
         return False
 
-    def __get_room_for_entrance(self, tile):
+    def __get_room_for_tile(self, tile):
         for room in self.rooms:
-            for entrance in room.entrances:
-                if (tile.x, tile.y) == (entrance[0], entrance[1]):
-                    return room
+            if (tile.x, tile.y) in room.locations:
+                return room
 
         return None
 
@@ -247,7 +280,7 @@ class GameBoard:
 
     def __is_viable_tile(self, start, dest, enter_from_direction):
         if dest.tile_type == TileTypes.ROOM_ENTRANCE and dest.entrance_direction == enter_from_direction:
-            if start.tile_type == TileTypes.HALLWAY or (start.tile_type == TileTypes.ROOM_ENTRANCE and self.__get_room_for_entrance(start) != self.__get_room_for_entrance(dest)):
+            if start.tile_type == TileTypes.HALLWAY or (start.tile_type == TileTypes.ROOM_ENTRANCE and self.__get_room_for_tile(start) != self.__get_room_for_tile(dest)):
                 return True
         elif dest.tile_type == TileTypes.HALLWAY:
             return True
@@ -267,8 +300,11 @@ class GameBoard:
 
         if selected_tile.move_candidate:
             player.current_tile.occupied = False
-            if selected_tile.tile_type == TileTypes.ROOM_ENTRANCE:
-                room = self.__get_room_for_entrance(selected_tile)
+            if (selected_tile.tile_type == TileTypes.ROOM_ENTRANCE
+                    or selected_tile.tile_type == TileTypes.PASSAGE_ONE
+                    or selected_tile.tile_type == TileTypes.PASSAGE_TWO
+            ):
+                room = self.__get_room_for_tile(selected_tile)
                 room_center = room.center
                 for y in range(2):
                     for x in range(-1, 2):

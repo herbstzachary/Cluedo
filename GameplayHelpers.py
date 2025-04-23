@@ -2,7 +2,6 @@ import random
 
 from Enums import Characters, Rooms, Weapons
 
-
 def create_deck(solution):
     deck = []
     for character in list(Characters):

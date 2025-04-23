@@ -1,8 +1,8 @@
 import pygame.draw
 from pygame import Rect
 
-from Colors import BLACK, BOARD_HALLWAY_TILE_COLOR, BOARD_ROOM_TILE_COLOR, BOARD_MOVE_CANDIDATE_TILE_COLOR
-from Enums import TileTypes, EntranceDirections
+from Colors import BLACK, BOARD_HALLWAY_TILE_COLOR, BOARD_ROOM_TILE_COLOR, BOARD_MOVE_CANDIDATE_TILE_COLOR, PURPLE, AQUA
+from Enums import TileTypes
 
 class Tile:
     def __init__(self, size, x, y, coord_offset):
@@ -28,3 +28,7 @@ class Tile:
             pygame.draw.rect(surface, BLACK, self.rect, width=1)
         elif self.tile_type == TileTypes.ROOM_ENTRANCE or self.tile_type == TileTypes.ROOM:
             pygame.draw.rect(surface, BOARD_ROOM_TILE_COLOR, self.rect)
+        elif self.tile_type == TileTypes.PASSAGE_ONE:
+            pygame.draw.rect(surface, PURPLE, self.rect)
+        elif self.tile_type == TileTypes.PASSAGE_TWO:
+            pygame.draw.rect(surface, AQUA, self.rect)
