@@ -3,7 +3,7 @@ import sys
 import pygame.sysfont
 from pygame import QUIT, Rect
 
-from Colors import WHITE, BLACK
+from Helpers.Colors import WHITE, BLACK
 
 class MainMenu:
 

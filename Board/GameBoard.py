@@ -1,8 +1,8 @@
 import pygame
 from pygame import Rect
 
-from Colors import BOARD_BACKGROUND_COLOR, BLACK, BOARD_WALL_COLOR
-from Enums import TileTypes
+from Helpers.Colors import BOARD_BACKGROUND_COLOR, BLACK, BOARD_WALL_COLOR
+from Helpers.Enums import TileTypes
 from Board.Rooms import *
 from Board.Tile import Tile
 

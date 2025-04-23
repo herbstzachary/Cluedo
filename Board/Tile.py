@@ -1,8 +1,8 @@
 import pygame.draw
 from pygame import Rect
 
-from Colors import BLACK, BOARD_HALLWAY_TILE_COLOR, BOARD_ROOM_TILE_COLOR, BOARD_MOVE_CANDIDATE_TILE_COLOR, PURPLE, AQUA
-from Enums import TileTypes
+from Helpers.Colors import BLACK, BOARD_HALLWAY_TILE_COLOR, BOARD_ROOM_TILE_COLOR, BOARD_MOVE_CANDIDATE_TILE_COLOR, PURPLE, AQUA
+from Helpers.Enums import TileTypes
 
 class Tile:
     def __init__(self, size, x, y, coord_offset):

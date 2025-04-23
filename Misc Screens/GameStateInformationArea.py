@@ -1,8 +1,8 @@
 import pygame
 from pygame import Rect
 
-from Colors import BLACK, GREY, GREEN
-from Enums import TurnPhases
+from Helpers.Colors import BLACK, GREY, GREEN
+from Helpers.Enums import TurnPhases
 
 class GameStateInformationArea:
 

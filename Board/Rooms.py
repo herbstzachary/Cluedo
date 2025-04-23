@@ -1,4 +1,4 @@
-from Enums import EntranceDirections, Rooms
+from Helpers.Enums import EntranceDirections, Rooms
 
 class Kitchen:
     type = Rooms.KITCHEN

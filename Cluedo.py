@@ -4,15 +4,15 @@ import random
 import pygame, sys
 from pygame.locals import *
 
-import Enums
-from Colors import *
+from Helpers import Enums
+from Helpers.Colors import *
 from Board.GameBoard import GameBoard
 from GameStateInformationArea import GameStateInformationArea
-from GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
+from Helpers.GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
 from MainMenu import MainMenu
-from PlayerArea import PlayerArea
-from Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
-from Player import Player
+from Player.PlayerArea import PlayerArea
+from Helpers.Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
+from Player.Player import Player
 
 # Initializing
 pygame.init()
@@ -118,7 +118,8 @@ while not game_over:
                     info_area.eliminated_player = None
                     if current_player.current_tile.tile_type == TileTypes.ROOM:
                         current_player_phase = TurnPhases.SUGGEST
-                        player_area.current_suggestion[Enums.Rooms] = board.get_room_for_tile(current_player.current_tile)
+                        player_area.current_suggestion[
+                            Enums.Rooms] = board.get_room_for_tile(current_player.current_tile)
                     else:
                         current_player_phase = TurnPhases.ACCUSE
             elif current_player_phase == TurnPhases.SUGGEST:
