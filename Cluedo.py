@@ -7,9 +7,9 @@ from pygame.locals import *
 from Helpers import Enums
 from Helpers.Colors import *
 from Board.GameBoard import GameBoard
-from GameStateInformationArea import GameStateInformationArea
 from Helpers.GameplayHelpers import create_deck, create_hands, check_suggestion, get_next_player, get_active_players
-from MainMenu import MainMenu
+from MiscScreens.GameStateInformationArea import GameStateInformationArea
+from MiscScreens.MainMenu import MainMenu
 from Player.PlayerArea import PlayerArea
 from Helpers.Enums import Characters, Rooms, Weapons, TurnPhases, TileTypes
 from Player.Player import Player

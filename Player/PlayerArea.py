@@ -2,9 +2,10 @@ import pygame
 from pygame import Rect
 
 from Helpers import Enums
-from Card import Card
 from Helpers.Colors import RED, BLUE, BLACK, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR
 from Helpers.Enums import TurnPhases
+from Player.Card import Card
+
 
 class PlayerArea:
     def __init__(self, area: Rect, card_font):

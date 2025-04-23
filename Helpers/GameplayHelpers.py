@@ -1,6 +1,7 @@
 import random
 
-from Enums import Characters, Rooms, Weapons
+from Helpers.Enums import Characters, Rooms, Weapons
+
 
 def create_deck(solution):
     deck = []
