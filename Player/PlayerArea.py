@@ -2,7 +2,8 @@ import pygame
 from pygame import Rect
 
 from Helpers import Enums
-from Helpers.Colors import RED, BLUE, BLACK, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR
+from Helpers.Colors import RED, BLUE, BLACK, CARD_BACKGROUND_COLOR, HAND_CARD_BACKGROUND_COLOR, \
+    BOARD_CARD_BACKGROUND_COLOR
 from Helpers.Enums import TurnPhases
 from Player.Card import Card
 
@@ -72,6 +73,8 @@ class PlayerArea:
                 pygame.draw.rect(surface, BLUE, card.rect)
             elif card_type in player.hand:
                 pygame.draw.rect(surface, HAND_CARD_BACKGROUND_COLOR, card.rect)
+            elif card_type in player.board_cards:
+                pygame.draw.rect(surface, BOARD_CARD_BACKGROUND_COLOR, card.rect)
             elif card_type in player.knowledge.keys():
                 pygame.draw.rect(surface, RED, card.rect)
                 additional_text = self.card_font.render("(" + player.knowledge[card_type].character.value + ")", True, BLACK)

@@ -8,6 +8,7 @@ BOARD_MOVE_CANDIDATE_TILE_COLOR = Color("springgreen")
 
 CARD_BACKGROUND_COLOR = Color("gray67")
 HAND_CARD_BACKGROUND_COLOR = Color("darksalmon")
+BOARD_CARD_BACKGROUND_COLOR = Color("aquamarine4")
 
 BLACK = Color("black")
 GREY = Color("grey")

@@ -37,7 +37,7 @@ solution = [
 deck = create_deck(solution)
 random.shuffle(deck)
 
-player_hands = create_hands(deck, number_of_players)
+player_hands, leftovers = create_hands(deck, number_of_players)
 
 board_font = pygame.font.Font("./resources/FuturaRenner-Regular.otf", int((40 * SCREEN_HEIGHT) / 1600))
 player_font = pygame.font.SysFont('Comic Sans MS', int((40 * SCREEN_HEIGHT) / 1600))
@@ -93,7 +93,8 @@ while len(players) > number_of_players:
 
 hand_index = 0
 for player in players:
-    player.set_hand(player_hands[hand_index])
+    player.hand = player_hands[hand_index]
+    player.board_cards = leftovers
     hand_index += 1
 
 board.players = players

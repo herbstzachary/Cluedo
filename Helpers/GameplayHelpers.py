@@ -31,11 +31,11 @@ def create_hands(card_deck, number_of_players):
         current_card = current_card + each_player_gets
         hands.append(hand)
 
+    leftovers = []
     for i in range(current_card, len(card_deck)):
-        for hand in hands:
-            hand.append(card_deck[i])
+        leftovers.append(card_deck[i])
 
-    return hands
+    return hands, leftovers
 
 
 def check_suggestion(players, current_player, suggestion):
