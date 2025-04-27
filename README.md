@@ -21,7 +21,7 @@
  3. If pygame is not installed when you run the above command, you will get an error. Make sure that you have it installed by following the instructions at the link provided in [Requirements](#Requirements)
 
 ## Requirements
- Python 3 (https://www.python.org/downloads/)\
+ Python 3 (https://www.python.org/downloads)\
  Pygame 2.6.1 (https://www.pygame.org/wiki/GettingStarted)
  
  
