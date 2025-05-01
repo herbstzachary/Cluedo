@@ -43,7 +43,7 @@ def check_suggestion(players, current_player, suggestion):
     if index >= len(players):
         index = 0
 
-    for _ in range(0, len(players)):
+    for _ in range(0, len(players) - 1):
         clues_present = []
         for card in suggestion.values():
             if card in players[index].hand:
