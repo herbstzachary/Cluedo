@@ -127,20 +127,34 @@ while not game_over:
                 player_area.select_card_for_guess(pos, current_player_phase)
                 if info_area.submit_guess(pos, player_area.current_suggestion):
                     suggestion = player_area.current_suggestion
+                    room = player_area.room_cards.get(suggestion.get(Rooms))
+                    weapon = player_area.weapon_cards.get(suggestion.get(Weapons))
+                    character = player_area.character_cards.get(suggestion.get(Characters))
 
-                    if current_player not in player_area.room_cards.get(suggestion.get(Rooms)).guessed:
-                        player_area.room_cards.get(suggestion.get(Rooms)).guessed.append(current_player)
+                    if current_player not in room.guessed:
+                        room.guessed.append(current_player)
 
-                    if current_player not in player_area.weapon_cards.get(suggestion.get(Weapons)).guessed:
-                        player_area.weapon_cards.get(suggestion.get(Weapons)).guessed.append(current_player)
+                    if current_player not in weapon.guessed:
+                        weapon.guessed.append(current_player)
 
-                    if current_player not in player_area.character_cards.get(suggestion.get(Characters)).guessed:
-                        player_area.character_cards.get(suggestion.get(Characters)).guessed.append(current_player)
+                    if current_player not in character.guessed:
+                        character.guessed.append(current_player)
 
                     new_knowledge = check_suggestion(players, current_player, suggestion)
 
                     if new_knowledge is not None:
                         current_player.add_knowledge(new_knowledge)
+
+                        player_that_revealed = list(new_knowledge.values())[0]
+
+                        if player_that_revealed not in room.possibly_revealed:
+                            room.possibly_revealed.append(player_that_revealed)
+
+                        if player_that_revealed not in weapon.possibly_revealed:
+                            weapon.possibly_revealed.append(player_that_revealed)
+
+                        if player_that_revealed not in character.possibly_revealed:
+                            character.possibly_revealed.append(player_that_revealed)
 
                     current_player_phase = TurnPhases.ACCUSE
                     player_area.clear_suggestion()

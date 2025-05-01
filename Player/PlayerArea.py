@@ -95,6 +95,20 @@ class PlayerArea:
                 else:
                     count += 1
 
+            count = 0
+            revealed_radius = (card.rect.width / 9)
+            revealed_center_x = card.rect.left + revealed_radius + 5
+            revealed_center_y = card.rect.bottom - (revealed_radius * 3) - 5
+            for revealed in card.possibly_revealed:
+                pygame.draw.circle(surface, revealed.color, (revealed_center_x, revealed_center_y), revealed_radius)
+                revealed_center_x += revealed_radius * 3
+                if count >= 2:
+                    revealed_center_x = card.rect.left + revealed_radius + 5
+                    revealed_center_y += revealed_radius * 2
+                    count = 0
+                else:
+                    count += 1
+
             pygame.draw.rect(surface, BLACK, card.rect, width=2)
             text_rect = text.get_rect()
             text_rect.center = (left_x + (self.card_width / 2), top_y + (self.card_height / 2))
