@@ -162,7 +162,6 @@ while not game_over:
                 advance = False
                 player_area.select_card_for_guess(pos, current_player_phase)
                 if info_area.submit_accuse(pos, player_area.current_suggestion):
-                    advance = True
                     accusation = player_area.current_suggestion
                     is_correct = True
                     for clue in accusation.values():
@@ -173,6 +172,7 @@ while not game_over:
                     if is_correct:
                         game_over = True
                     else:
+                        advance = True
                         index = players.index(current_player)
                         players[index].active = False
                         current_player.current_tile.occupied = False
